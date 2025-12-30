@@ -56,5 +56,3 @@ public class AuthService {
         return new AuthResponse(token, "Bearer", user.getId(), user.getEmail(), user.getFullName());
     }
 }
-
-
