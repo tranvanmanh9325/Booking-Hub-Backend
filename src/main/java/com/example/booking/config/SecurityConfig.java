@@ -35,6 +35,7 @@ public class SecurityConfig {
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api/health").permitAll()
+                .requestMatchers("/api/partnership/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/movies/**", "/api/cinemas/**", "/api/hotels/**").permitAll()
                 .requestMatchers("/api/movies/book", "/api/movies/bookings/**", "/api/hotels/book", "/api/hotels/bookings/**").authenticated()
                 .requestMatchers("/api/payments/**").authenticated()
