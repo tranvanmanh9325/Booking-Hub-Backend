@@ -26,4 +26,3 @@ public class CinemaController {
         return ResponseEntity.ok(movieService.getCinemaById(id));
     }
 }
-

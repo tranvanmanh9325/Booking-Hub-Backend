@@ -23,4 +23,3 @@ public class MovieBookingDTO {
     private Double totalPrice;
     private List<SeatDTO> seats;
 }
-

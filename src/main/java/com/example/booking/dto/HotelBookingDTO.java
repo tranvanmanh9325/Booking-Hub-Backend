@@ -24,4 +24,3 @@ public class HotelBookingDTO {
     private String status;
     private LocalDateTime createdAt;
 }
-

@@ -19,4 +19,3 @@ public class HotelDTO {
     private String email;
     private Double averageRating;
 }
-

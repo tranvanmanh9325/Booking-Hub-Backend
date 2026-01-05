@@ -61,12 +61,18 @@ public class MovieController {
             @Valid @RequestBody BookMovieRequest request,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(movieService.bookMovie(user.getId(), request));
     }
     
     @GetMapping("/bookings")
     public ResponseEntity<List<MovieBookingDTO>> getUserBookings(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(movieService.getUserBookings(user.getId()));
     }
     
@@ -75,6 +81,9 @@ public class MovieController {
             @PathVariable Long bookingId,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(movieService.getBookingById(bookingId, user.getId()));
     }
     
@@ -83,7 +92,9 @@ public class MovieController {
             @PathVariable Long bookingId,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(movieService.cancelBooking(bookingId, user.getId()));
     }
 }
-

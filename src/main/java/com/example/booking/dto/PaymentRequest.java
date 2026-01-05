@@ -25,4 +25,3 @@ public class PaymentRequest {
     @NotBlank(message = "Payment method is required")
     private String paymentMethod; // VISA, MASTERCARD, MOMO, ZALOPAY, VNPAY
 }
-

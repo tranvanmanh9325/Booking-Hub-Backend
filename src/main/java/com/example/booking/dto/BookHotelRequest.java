@@ -29,4 +29,3 @@ public class BookHotelRequest {
     @Positive(message = "Number of guests must be positive")
     private Integer guests;
 }
-

@@ -15,4 +15,3 @@ public class CinemaDTO {
     private String facilities;
     private String phoneNumber;
 }
-

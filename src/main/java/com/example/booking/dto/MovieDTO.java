@@ -20,4 +20,3 @@ public class MovieDTO {
     private String trailerUrl;
     private LocalDateTime releaseDate;
 }
-

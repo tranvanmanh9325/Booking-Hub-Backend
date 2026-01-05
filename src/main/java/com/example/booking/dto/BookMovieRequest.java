@@ -19,4 +19,3 @@ public class BookMovieRequest {
     @NotEmpty(message = "At least one seat must be selected")
     private List<Long> seatIds;
 }
-

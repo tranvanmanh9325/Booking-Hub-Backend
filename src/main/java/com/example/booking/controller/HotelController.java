@@ -63,12 +63,18 @@ public class HotelController {
             @Valid @RequestBody BookHotelRequest request,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(hotelService.bookHotel(user.getId(), request));
     }
     
     @GetMapping("/bookings")
     public ResponseEntity<List<HotelBookingDTO>> getUserBookings(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(hotelService.getUserBookings(user.getId()));
     }
     
@@ -77,6 +83,9 @@ public class HotelController {
             @PathVariable Long bookingId,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(hotelService.getBookingById(bookingId, user.getId()));
     }
     
@@ -85,7 +94,9 @@ public class HotelController {
             @PathVariable Long bookingId,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
         return ResponseEntity.ok(hotelService.cancelBooking(bookingId, user.getId()));
     }
 }
-

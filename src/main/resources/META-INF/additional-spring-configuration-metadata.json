@@ -1,0 +1,30 @@
+{
+  "properties": [
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "Secret key used for signing JWT tokens. Should be a strong, randomly generated string.",
+      "sourceType": "com.example.booking.util.JwtUtil"
+    },
+    {
+      "name": "jwt.expiration",
+      "type": "java.lang.Long",
+      "description": "JWT token expiration time in milliseconds. Default is 86400000 (24 hours).",
+      "sourceType": "com.example.booking.util.JwtUtil",
+      "defaultValue": 86400000
+    },
+    {
+      "name": "cors.allowed-origins",
+      "type": "java.lang.String",
+      "description": "Comma-separated list of allowed CORS origins.",
+      "defaultValue": "http://localhost:3000,http://localhost:3001"
+    },
+    {
+      "name": "app.partnership.recipient-email",
+      "type": "java.lang.String",
+      "description": "Email address to receive partnership requests.",
+      "sourceType": "com.example.booking.service.EmailService",
+      "defaultValue": "manhtrana1k45tl@gmail.com"
+    }
+  ]
+}

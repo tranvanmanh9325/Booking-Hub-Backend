@@ -20,4 +20,3 @@ public class PaymentDTO {
     private LocalDateTime paidAt;
     private LocalDateTime createdAt;
 }
-
