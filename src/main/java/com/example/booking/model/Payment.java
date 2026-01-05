@@ -59,4 +59,3 @@ public class Payment {
         updatedAt = LocalDateTime.now();
     }
 }
-

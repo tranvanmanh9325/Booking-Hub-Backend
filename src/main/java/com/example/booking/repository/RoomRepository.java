@@ -16,4 +16,3 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query("SELECT r FROM Room r WHERE r.hotel.id = :hotelId AND r.maxGuests >= :guests")
     List<Room> findAvailableRoomsByHotelAndGuests(@Param("hotelId") Long hotelId, @Param("guests") Integer guests);
 }
-

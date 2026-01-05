@@ -63,4 +63,3 @@ public class Movie {
         updatedAt = LocalDateTime.now();
     }
 }
-

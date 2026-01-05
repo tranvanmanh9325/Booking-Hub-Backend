@@ -56,4 +56,3 @@ public class Showtime {
         updatedAt = LocalDateTime.now();
     }
 }
-

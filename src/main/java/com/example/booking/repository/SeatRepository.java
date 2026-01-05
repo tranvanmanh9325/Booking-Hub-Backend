@@ -19,4 +19,3 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
                                                   @Param("row") String row, 
                                                   @Param("number") Integer number);
 }
-

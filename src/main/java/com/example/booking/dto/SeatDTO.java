@@ -15,4 +15,3 @@ public class SeatDTO {
     private String seatType;
     private Boolean isBooked;
 }
-

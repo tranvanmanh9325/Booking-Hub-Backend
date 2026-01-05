@@ -21,4 +21,3 @@ public class ShowtimeDTO {
     private LocalDateTime endTime;
     private Double price;
 }
-

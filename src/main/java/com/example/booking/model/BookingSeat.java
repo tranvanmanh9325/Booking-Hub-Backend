@@ -29,7 +29,7 @@ public class BookingSeat {
     @Column(nullable = false)
     private Double price;
     
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     
     @PrePersist
@@ -37,4 +37,3 @@ public class BookingSeat {
         createdAt = LocalDateTime.now();
     }
 }
-

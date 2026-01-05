@@ -25,4 +25,3 @@ public interface HotelBookingRepository extends JpaRepository<HotelBooking, Long
                                                 @Param("checkIn") LocalDate checkIn,
                                                 @Param("checkOut") LocalDate checkOut);
 }
-

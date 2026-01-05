@@ -20,4 +20,3 @@ public class RoomDTO {
     private List<String> imageUrls;
     private Boolean isAvailable;
 }
-

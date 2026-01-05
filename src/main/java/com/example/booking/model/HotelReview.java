@@ -40,4 +40,3 @@ public class HotelReview {
         createdAt = LocalDateTime.now();
     }
 }
-

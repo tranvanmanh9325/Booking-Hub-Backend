@@ -15,4 +15,3 @@ public interface MovieBookingRepository extends JpaRepository<MovieBooking, Long
     
     List<MovieBooking> findByShowtimeId(Long showtimeId);
 }
-

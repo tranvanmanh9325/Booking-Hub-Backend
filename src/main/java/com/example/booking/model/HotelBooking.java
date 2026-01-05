@@ -63,4 +63,3 @@ public class HotelBooking {
         updatedAt = LocalDateTime.now();
     }
 }
-

@@ -18,4 +18,3 @@ public interface BookingSeatRepository extends JpaRepository<BookingSeat, Long> 
            "WHERE b.showtime.id = :showtimeId AND b.status IN ('PENDING', 'CONFIRMED')")
     List<Long> findBookedSeatIdsByShowtimeId(@Param("showtimeId") Long showtimeId);
 }
-

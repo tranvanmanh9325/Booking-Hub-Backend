@@ -19,4 +19,3 @@ public interface HotelReviewRepository extends JpaRepository<HotelReview, Long> 
     @Query("SELECT AVG(hr.rating) FROM HotelReview hr WHERE hr.hotel.id = :hotelId")
     Double getAverageRatingByHotelId(@Param("hotelId") Long hotelId);
 }
-

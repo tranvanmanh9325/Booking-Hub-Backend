@@ -48,4 +48,3 @@ public class Seat {
         updatedAt = LocalDateTime.now();
     }
 }
-

@@ -13,4 +13,3 @@ public interface CinemaRepository extends JpaRepository<Cinema, Long> {
     
     List<Cinema> findByNameContainingIgnoreCase(String name);
 }
-

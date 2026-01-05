@@ -15,9 +15,7 @@ public class BookingApplication {
 					.load();
 			
 			// Set system properties from .env file
-			dotenv.entries().forEach(entry -> {
-				System.setProperty(entry.getKey(), entry.getValue());
-			});
+			dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 		} catch (Exception e) {
 			System.err.println("Warning: Could not load .env file: " + e.getMessage());
 			System.err.println("Continuing with system environment variables and application.properties defaults...");

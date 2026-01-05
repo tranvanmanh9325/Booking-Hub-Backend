@@ -20,4 +20,3 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("SELECT m FROM Movie m WHERE m.releaseDate > CURRENT_TIMESTAMP ORDER BY m.releaseDate ASC")
     List<Movie> findUpcoming();
 }
-

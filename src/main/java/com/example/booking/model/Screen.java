@@ -55,4 +55,3 @@ public class Screen {
         updatedAt = LocalDateTime.now();
     }
 }
-

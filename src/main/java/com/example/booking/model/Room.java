@@ -61,4 +61,3 @@ public class Room {
         updatedAt = LocalDateTime.now();
     }
 }
-

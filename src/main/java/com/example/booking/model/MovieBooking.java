@@ -59,4 +59,3 @@ public class MovieBooking {
         updatedAt = LocalDateTime.now();
     }
 }
-

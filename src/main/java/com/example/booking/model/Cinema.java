@@ -54,4 +54,3 @@ public class Cinema {
         updatedAt = LocalDateTime.now();
     }
 }
-
