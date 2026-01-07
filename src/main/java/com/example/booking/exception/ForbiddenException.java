@@ -3,13 +3,13 @@ package com.example.booking.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class ValidationException extends RuntimeException {
-    public ValidationException(String message) {
+@ResponseStatus(HttpStatus.FORBIDDEN)
+public class ForbiddenException extends RuntimeException {
+    public ForbiddenException(String message) {
         super(message);
     }
 
-    public ValidationException(String message, Throwable cause) {
+    public ForbiddenException(String message, Throwable cause) {
         super(message, cause);
     }
 }

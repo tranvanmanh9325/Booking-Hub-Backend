@@ -4,13 +4,16 @@ import com.example.booking.dto.CinemaDTO;
 import com.example.booking.service.MovieService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.constraints.Min;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/cinemas")
 @CrossOrigin(origins = "*")
+@Validated
 public class CinemaController {
 
     private final MovieService movieService;
@@ -25,7 +28,7 @@ public class CinemaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CinemaDTO> getCinemaById(@PathVariable Long id) {
+    public ResponseEntity<CinemaDTO> getCinemaById(@PathVariable @Min(1) Long id) {
         return ResponseEntity.ok(movieService.getCinemaById(id));
     }
 }

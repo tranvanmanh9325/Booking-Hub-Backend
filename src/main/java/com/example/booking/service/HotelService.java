@@ -4,6 +4,8 @@ import com.example.booking.dto.*;
 import com.example.booking.model.*;
 import com.example.booking.repository.*;
 
+import com.example.booking.exception.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,8 +14,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class HotelService {
+
+    private static final Logger logger = LoggerFactory.getLogger(HotelService.class);
 
     private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
@@ -31,40 +38,77 @@ public class HotelService {
         this.userRepository = userRepository;
     }
 
+    @org.springframework.cache.annotation.Cacheable("hotels")
     public List<HotelDTO> getAllHotels() {
-        return hotelRepository.findAll().stream()
-                .map(this::convertToDTO)
+        logger.info("Fetching all hotels");
+        List<Hotel> hotels = hotelRepository.findAll();
+        List<HotelRatingDTO> ratings = hotelReviewRepository.getAllAverageRatings();
+        java.util.Map<Long, Double> ratingMap = ratings.stream()
+                .collect(Collectors.toMap(HotelRatingDTO::getHotelId, HotelRatingDTO::getAverageRating));
+
+        return hotels.stream()
+                .map(hotel -> convertToDTO(hotel, ratingMap.get(hotel.getId())))
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.cache.annotation.Cacheable(value = "hotels", key = "#id")
     public HotelDTO getHotelById(Long id) {
+        logger.debug("Fetching hotel with id: {}", id);
         Hotel hotel = hotelRepository.findById(java.util.Objects.requireNonNull(id))
-                .orElseThrow(() -> new RuntimeException("Hotel not found"));
-        return convertToDTO(hotel);
+                .orElseThrow(() -> {
+                    logger.error("Hotel not found with id: {}", id);
+                    return new ResourceNotFoundException("Hotel not found");
+                });
+        Double rating = hotelReviewRepository.getAverageRatingByHotelId(id);
+        return convertToDTO(hotel, rating);
     }
 
     public List<HotelDTO> searchHotels(String query) {
-        return hotelRepository.findByNameContainingIgnoreCase(query).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        List<Hotel> hotels = hotelRepository.findByNameContainingIgnoreCase(query);
+        return convertHotelsWithRatings(hotels);
     }
 
     public List<HotelDTO> getHotelsByCity(String city) {
-        return hotelRepository.findByCity(city).stream()
-                .map(this::convertToDTO)
+        List<Hotel> hotels = hotelRepository.findByCity(city);
+        return convertHotelsWithRatings(hotels);
+    }
+
+    private List<HotelDTO> convertHotelsWithRatings(List<Hotel> hotels) {
+        if (hotels.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        List<Long> hotelIds = hotels.stream().map(Hotel::getId).collect(Collectors.toList());
+        List<HotelRatingDTO> ratings = hotelReviewRepository.getAverageRatingsByHotelIds(hotelIds);
+        java.util.Map<Long, Double> ratingMap = ratings.stream()
+                .collect(Collectors.toMap(HotelRatingDTO::getHotelId, HotelRatingDTO::getAverageRating));
+
+        return hotels.stream()
+                .map(hotel -> convertToDTO(hotel, ratingMap.get(hotel.getId())))
                 .collect(Collectors.toList());
     }
 
     public List<RoomDTO> getRoomsByHotel(Long hotelId, LocalDate checkIn, LocalDate checkOut, Integer guests) {
+        logger.info("Searching rooms for hotelId: {}, checkIn: {}, checkOut: {}, guests: {}", hotelId, checkIn,
+                checkOut, guests);
         List<Room> rooms = roomRepository.findAvailableRoomsByHotelAndGuests(hotelId, guests);
+
+        if (rooms.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Long> roomIds = rooms.stream().map(Room::getId).collect(Collectors.toList());
+        List<HotelBooking> conflictingBookings = hotelBookingRepository.findConflictingBookingsForRooms(
+                roomIds, checkIn, checkOut);
+
+        // Create a set of occupied room IDs
+        java.util.Set<Long> occupiedRoomIds = conflictingBookings.stream()
+                .map(booking -> booking.getRoom().getId())
+                .collect(Collectors.toSet());
 
         return rooms.stream()
                 .map(room -> {
                     RoomDTO dto = convertToRoomDTO(room);
-                    // Check availability
-                    List<HotelBooking> conflictingBookings = hotelBookingRepository.findConflictingBookings(
-                            room.getId(), checkIn, checkOut);
-                    dto.setIsAvailable(conflictingBookings.isEmpty());
+                    dto.setIsAvailable(!occupiedRoomIds.contains(room.getId()));
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -72,31 +116,32 @@ public class HotelService {
 
     @Transactional
     public HotelBookingDTO bookHotel(Long userId, BookHotelRequest request) {
+        logger.info("Processing hotel booking for userId: {}", userId);
         User user = userRepository.findById(java.util.Objects.requireNonNull(userId))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Hotel hotel = hotelRepository.findById(java.util.Objects.requireNonNull(request.getHotelId()))
-                .orElseThrow(() -> new RuntimeException("Hotel not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found"));
 
         Room room = roomRepository.findById(java.util.Objects.requireNonNull(request.getRoomId()))
-                .orElseThrow(() -> new RuntimeException("Room not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
 
         // Validate dates
         if (request.getCheckIn().isAfter(request.getCheckOut()) ||
                 request.getCheckIn().isBefore(LocalDate.now())) {
-            throw new RuntimeException("Invalid check-in/check-out dates");
+            throw new BadRequestException("Invalid check-in/check-out dates");
         }
 
         // Check availability
         List<HotelBooking> conflictingBookings = hotelBookingRepository.findConflictingBookings(
                 request.getRoomId(), request.getCheckIn(), request.getCheckOut());
         if (!conflictingBookings.isEmpty()) {
-            throw new RuntimeException("Room is not available for the selected dates");
+            throw new ConflictException("Room is not available for the selected dates");
         }
 
         // Check guests
         if (request.getGuests() > room.getMaxGuests()) {
-            throw new RuntimeException("Number of guests exceeds room capacity");
+            throw new BadRequestException("Number of guests exceeds room capacity");
         }
 
         // Calculate total price
@@ -127,10 +172,10 @@ public class HotelService {
 
     public HotelBookingDTO getBookingById(Long bookingId, Long userId) {
         HotelBooking booking = hotelBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
         if (!booking.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized access to booking");
+            throw new ForbiddenException("Unauthorized access to booking");
         }
 
         return convertToBookingDTO(booking);
@@ -139,14 +184,14 @@ public class HotelService {
     @Transactional
     public HotelBookingDTO cancelBooking(Long bookingId, Long userId) {
         HotelBooking booking = hotelBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
         if (!booking.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized access to booking");
+            throw new ForbiddenException("Unauthorized access to booking");
         }
 
         if (!booking.getStatus().equals("PENDING") && !booking.getStatus().equals("CONFIRMED")) {
-            throw new RuntimeException("Cannot cancel booking with status: " + booking.getStatus());
+            throw new BadRequestException("Cannot cancel booking with status: " + booking.getStatus());
         }
 
         booking.setStatus("CANCELLED");
@@ -156,8 +201,7 @@ public class HotelService {
     }
 
     // Helper methods
-    private HotelDTO convertToDTO(Hotel hotel) {
-        Double averageRating = hotelReviewRepository.getAverageRatingByHotelId(hotel.getId());
+    private HotelDTO convertToDTO(Hotel hotel, Double averageRating) {
         return new HotelDTO(
                 hotel.getId(),
                 hotel.getName(),

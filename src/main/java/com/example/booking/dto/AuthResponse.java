@@ -2,6 +2,7 @@ package com.example.booking.dto;
 
 public class AuthResponse {
     private String token;
+    private String refreshToken;
     private String type = "Bearer";
     private Long userId;
     private String email;
@@ -10,8 +11,9 @@ public class AuthResponse {
     public AuthResponse() {
     }
 
-    public AuthResponse(String token, String type, Long userId, String email, String fullName) {
+    public AuthResponse(String token, String refreshToken, String type, Long userId, String email, String fullName) {
         this.token = token;
+        this.refreshToken = refreshToken;
         this.type = type;
         this.userId = userId;
         this.email = email;
@@ -24,6 +26,14 @@ public class AuthResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public String getType() {

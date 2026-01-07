@@ -3,6 +3,7 @@ package com.example.booking.controller;
 import com.example.booking.dto.AuthRequest;
 import com.example.booking.dto.AuthResponse;
 import com.example.booking.dto.GoogleAuthRequest;
+import com.example.booking.dto.RefreshTokenRequest;
 import com.example.booking.dto.RegisterRequest;
 import com.example.booking.service.AuthService;
 import jakarta.validation.Valid;
@@ -41,5 +42,10 @@ public class AuthController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refreshToken(request));
     }
 }

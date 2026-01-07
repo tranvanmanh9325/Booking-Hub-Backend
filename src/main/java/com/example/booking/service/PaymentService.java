@@ -7,6 +7,8 @@ import com.example.booking.model.HotelBooking;
 import com.example.booking.model.Payment;
 import com.example.booking.repository.*;
 
+import com.example.booking.exception.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +36,7 @@ public class PaymentService {
         Double bookingAmount = validateBookingAndGetAmount(request.getBookingId(), request.getBookingType());
 
         if (!request.getAmount().equals(bookingAmount)) {
-            throw new RuntimeException("Payment amount does not match booking amount");
+            throw new BadRequestException("Payment amount does not match booking amount");
         }
 
         // Create payment record
@@ -70,13 +72,13 @@ public class PaymentService {
 
     public PaymentDTO getPaymentById(Long paymentId) {
         Payment payment = paymentRepository.findById(java.util.Objects.requireNonNull(paymentId))
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
         return convertToDTO(payment);
     }
 
     public PaymentDTO getPaymentByTransactionId(String transactionId) {
         Payment payment = paymentRepository.findByTransactionId(transactionId)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
         return convertToDTO(payment);
     }
 
@@ -89,10 +91,10 @@ public class PaymentService {
     @Transactional
     public PaymentDTO refundPayment(Long paymentId) {
         Payment payment = paymentRepository.findById(java.util.Objects.requireNonNull(paymentId))
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
 
         if (!payment.getStatus().equals("SUCCESS")) {
-            throw new RuntimeException("Can only refund successful payments");
+            throw new BadRequestException("Can only refund successful payments");
         }
 
         // Simulate refund processing
@@ -109,22 +111,22 @@ public class PaymentService {
         switch (bookingType.toUpperCase()) {
             case "MOVIE":
                 MovieBooking movieBooking = movieBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
-                        .orElseThrow(() -> new RuntimeException("Movie booking not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Movie booking not found"));
                 if (!movieBooking.getStatus().equals("PENDING")) {
-                    throw new RuntimeException("Booking is not in PENDING status");
+                    throw new BadRequestException("Booking is not in PENDING status");
                 }
                 return movieBooking.getTotalPrice();
 
             case "HOTEL":
                 HotelBooking hotelBooking = hotelBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
-                        .orElseThrow(() -> new RuntimeException("Hotel booking not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Hotel booking not found"));
                 if (!hotelBooking.getStatus().equals("PENDING")) {
-                    throw new RuntimeException("Booking is not in PENDING status");
+                    throw new BadRequestException("Booking is not in PENDING status");
                 }
                 return hotelBooking.getTotalPrice();
 
             default:
-                throw new RuntimeException("Unsupported booking type: " + bookingType);
+                throw new BadRequestException("Unsupported booking type: " + bookingType);
         }
     }
 
@@ -132,14 +134,14 @@ public class PaymentService {
         switch (bookingType.toUpperCase()) {
             case "MOVIE":
                 MovieBooking movieBooking = movieBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
-                        .orElseThrow(() -> new RuntimeException("Movie booking not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Movie booking not found"));
                 movieBooking.setStatus(status);
                 movieBookingRepository.save(movieBooking);
                 break;
 
             case "HOTEL":
                 HotelBooking hotelBooking = hotelBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
-                        .orElseThrow(() -> new RuntimeException("Hotel booking not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Hotel booking not found"));
                 hotelBooking.setStatus(status);
                 hotelBookingRepository.save(hotelBooking);
                 break;

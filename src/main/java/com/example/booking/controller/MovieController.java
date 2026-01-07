@@ -4,6 +4,9 @@ import com.example.booking.dto.*;
 import com.example.booking.model.User;
 import com.example.booking.service.MovieService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+
+import org.springframework.validation.annotation.Validated;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/movies")
 @CrossOrigin(origins = "*")
+@Validated
 public class MovieController {
 
     private final MovieService movieService;
@@ -28,7 +32,7 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MovieDTO> getMovieById(@PathVariable Long id) {
+    public ResponseEntity<MovieDTO> getMovieById(@PathVariable @Min(1) Long id) {
         return ResponseEntity.ok(movieService.getMovieById(id));
     }
 
@@ -48,14 +52,14 @@ public class MovieController {
     }
 
     @GetMapping("/{movieId}/showtimes")
-    public ResponseEntity<List<ShowtimeDTO>> getShowtimesByMovie(@PathVariable Long movieId) {
+    public ResponseEntity<List<ShowtimeDTO>> getShowtimesByMovie(@PathVariable @Min(1) Long movieId) {
         return ResponseEntity.ok(movieService.getShowtimesByMovie(movieId));
     }
 
     @GetMapping("/showtimes/{showtimeId}/seats")
     public ResponseEntity<List<SeatDTO>> getSeatsByShowtime(
-            @PathVariable Long showtimeId,
-            @RequestParam Long screenId) {
+            @PathVariable @Min(1) Long showtimeId,
+            @RequestParam @Min(1) Long screenId) {
         return ResponseEntity.ok(movieService.getSeatsByScreen(screenId, showtimeId));
     }
 
@@ -81,7 +85,7 @@ public class MovieController {
 
     @GetMapping("/bookings/{bookingId}")
     public ResponseEntity<MovieBookingDTO> getBookingById(
-            @PathVariable Long bookingId,
+            @PathVariable @Min(1) Long bookingId,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         if (user == null) {
@@ -92,7 +96,7 @@ public class MovieController {
 
     @PutMapping("/bookings/{bookingId}/cancel")
     public ResponseEntity<MovieBookingDTO> cancelBooking(
-            @PathVariable Long bookingId,
+            @PathVariable @Min(1) Long bookingId,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         if (user == null) {

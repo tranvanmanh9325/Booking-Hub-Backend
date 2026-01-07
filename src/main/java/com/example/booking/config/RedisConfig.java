@@ -10,6 +10,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     @Bean
+    public org.springframework.cache.CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        return org.springframework.data.redis.cache.RedisCacheManager.builder(connectionFactory).build();
+    }
+
+    @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);

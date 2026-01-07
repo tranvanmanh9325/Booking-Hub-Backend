@@ -1,28 +1,14 @@
 -- ============================================
--- Booking Hub Database Schema
+-- Booking Hub Database Schema - Initialization
 -- PostgreSQL Database Schema
+-- This file is automatically executed on application startup
+-- Note: If tables already exist, errors will be ignored due to continue-on-error=true
 -- ============================================
-
--- Drop existing tables if needed (in reverse order of dependencies)
-DROP TABLE IF EXISTS booking_seats CASCADE;
-DROP TABLE IF EXISTS movie_bookings CASCADE;
-DROP TABLE IF EXISTS showtimes CASCADE;
-DROP TABLE IF EXISTS seats CASCADE;
-DROP TABLE IF EXISTS screens CASCADE;
-DROP TABLE IF EXISTS movies CASCADE;
-DROP TABLE IF EXISTS cinemas CASCADE;
-DROP TABLE IF EXISTS hotel_reviews CASCADE;
-DROP TABLE IF EXISTS hotel_bookings CASCADE;
-DROP TABLE IF EXISTS room_images CASCADE;
-DROP TABLE IF EXISTS rooms CASCADE;
-DROP TABLE IF EXISTS hotels CASCADE;
-DROP TABLE IF EXISTS payments CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
 
 -- ============================================
 -- Users Table
 -- ============================================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(255) UNIQUE,
@@ -33,13 +19,13 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_phone ON users(phone);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
 
 -- ============================================
 -- Hotels Table
 -- ============================================
-CREATE TABLE hotels (
+CREATE TABLE IF NOT EXISTS hotels (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     address VARCHAR(500),
@@ -53,13 +39,13 @@ CREATE TABLE hotels (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_hotels_city ON hotels(city);
-CREATE INDEX idx_hotels_star_rating ON hotels(star_rating);
+CREATE INDEX IF NOT EXISTS idx_hotels_city ON hotels(city);
+CREATE INDEX IF NOT EXISTS idx_hotels_star_rating ON hotels(star_rating);
 
 -- ============================================
 -- Rooms Table
 -- ============================================
-CREATE TABLE rooms (
+CREATE TABLE IF NOT EXISTS rooms (
     id BIGSERIAL PRIMARY KEY,
     hotel_id BIGINT NOT NULL,
     room_type VARCHAR(100) NOT NULL,
@@ -72,13 +58,13 @@ CREATE TABLE rooms (
     CONSTRAINT fk_rooms_hotel FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_rooms_hotel_id ON rooms(hotel_id);
-CREATE INDEX idx_rooms_room_type ON rooms(room_type);
+CREATE INDEX IF NOT EXISTS idx_rooms_hotel_id ON rooms(hotel_id);
+CREATE INDEX IF NOT EXISTS idx_rooms_room_type ON rooms(room_type);
 
 -- ============================================
 -- Room Images Table
 -- ============================================
-CREATE TABLE room_images (
+CREATE TABLE IF NOT EXISTS room_images (
     id BIGSERIAL PRIMARY KEY,
     room_id BIGINT NOT NULL,
     image_url VARCHAR(500) NOT NULL,
@@ -87,13 +73,13 @@ CREATE TABLE room_images (
     CONSTRAINT fk_room_images_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_room_images_room_id ON room_images(room_id);
-CREATE INDEX idx_room_images_is_primary ON room_images(is_primary);
+CREATE INDEX IF NOT EXISTS idx_room_images_room_id ON room_images(room_id);
+CREATE INDEX IF NOT EXISTS idx_room_images_is_primary ON room_images(is_primary);
 
 -- ============================================
 -- Hotel Bookings Table
 -- ============================================
-CREATE TABLE hotel_bookings (
+CREATE TABLE IF NOT EXISTS hotel_bookings (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     hotel_id BIGINT NOT NULL,
@@ -112,16 +98,16 @@ CREATE TABLE hotel_bookings (
     CONSTRAINT chk_hotel_bookings_guests CHECK (guests > 0)
 );
 
-CREATE INDEX idx_hotel_bookings_user_id ON hotel_bookings(user_id);
-CREATE INDEX idx_hotel_bookings_hotel_id ON hotel_bookings(hotel_id);
-CREATE INDEX idx_hotel_bookings_room_id ON hotel_bookings(room_id);
-CREATE INDEX idx_hotel_bookings_status ON hotel_bookings(status);
-CREATE INDEX idx_hotel_bookings_check_in ON hotel_bookings(check_in);
+CREATE INDEX IF NOT EXISTS idx_hotel_bookings_user_id ON hotel_bookings(user_id);
+CREATE INDEX IF NOT EXISTS idx_hotel_bookings_hotel_id ON hotel_bookings(hotel_id);
+CREATE INDEX IF NOT EXISTS idx_hotel_bookings_room_id ON hotel_bookings(room_id);
+CREATE INDEX IF NOT EXISTS idx_hotel_bookings_status ON hotel_bookings(status);
+CREATE INDEX IF NOT EXISTS idx_hotel_bookings_check_in ON hotel_bookings(check_in);
 
 -- ============================================
 -- Hotel Reviews Table
 -- ============================================
-CREATE TABLE hotel_reviews (
+CREATE TABLE IF NOT EXISTS hotel_reviews (
     id BIGSERIAL PRIMARY KEY,
     hotel_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
@@ -133,14 +119,14 @@ CREATE TABLE hotel_reviews (
     CONSTRAINT chk_hotel_reviews_rating CHECK (rating >= 1 AND rating <= 5)
 );
 
-CREATE INDEX idx_hotel_reviews_hotel_id ON hotel_reviews(hotel_id);
-CREATE INDEX idx_hotel_reviews_user_id ON hotel_reviews(user_id);
-CREATE INDEX idx_hotel_reviews_rating ON hotel_reviews(rating);
+CREATE INDEX IF NOT EXISTS idx_hotel_reviews_hotel_id ON hotel_reviews(hotel_id);
+CREATE INDEX IF NOT EXISTS idx_hotel_reviews_user_id ON hotel_reviews(user_id);
+CREATE INDEX IF NOT EXISTS idx_hotel_reviews_rating ON hotel_reviews(rating);
 
 -- ============================================
 -- Cinemas Table
 -- ============================================
-CREATE TABLE cinemas (
+CREATE TABLE IF NOT EXISTS cinemas (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     address VARCHAR(500),
@@ -151,12 +137,12 @@ CREATE TABLE cinemas (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_cinemas_city ON cinemas(city);
+CREATE INDEX IF NOT EXISTS idx_cinemas_city ON cinemas(city);
 
 -- ============================================
 -- Screens Table
 -- ============================================
-CREATE TABLE screens (
+CREATE TABLE IF NOT EXISTS screens (
     id BIGSERIAL PRIMARY KEY,
     cinema_id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -167,13 +153,13 @@ CREATE TABLE screens (
     CONSTRAINT fk_screens_cinema FOREIGN KEY (cinema_id) REFERENCES cinemas(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_screens_cinema_id ON screens(cinema_id);
-CREATE INDEX idx_screens_screen_type ON screens(screen_type);
+CREATE INDEX IF NOT EXISTS idx_screens_cinema_id ON screens(cinema_id);
+CREATE INDEX IF NOT EXISTS idx_screens_screen_type ON screens(screen_type);
 
 -- ============================================
 -- Seats Table
 -- ============================================
-CREATE TABLE seats (
+CREATE TABLE IF NOT EXISTS seats (
     id BIGSERIAL PRIMARY KEY,
     screen_id BIGINT NOT NULL,
     row VARCHAR(10) NOT NULL,
@@ -185,13 +171,13 @@ CREATE TABLE seats (
     CONSTRAINT uk_seats_screen_row_number UNIQUE (screen_id, row, number)
 );
 
-CREATE INDEX idx_seats_screen_id ON seats(screen_id);
-CREATE INDEX idx_seats_row_number ON seats(row, number);
+CREATE INDEX IF NOT EXISTS idx_seats_screen_id ON seats(screen_id);
+CREATE INDEX IF NOT EXISTS idx_seats_row_number ON seats(row, number);
 
 -- ============================================
 -- Movies Table
 -- ============================================
-CREATE TABLE movies (
+CREATE TABLE IF NOT EXISTS movies (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(1000),
@@ -207,14 +193,14 @@ CREATE TABLE movies (
     CONSTRAINT chk_movies_duration CHECK (duration > 0)
 );
 
-CREATE INDEX idx_movies_title ON movies(title);
-CREATE INDEX idx_movies_genre ON movies(genre);
-CREATE INDEX idx_movies_release_date ON movies(release_date);
+CREATE INDEX IF NOT EXISTS idx_movies_title ON movies(title);
+CREATE INDEX IF NOT EXISTS idx_movies_genre ON movies(genre);
+CREATE INDEX IF NOT EXISTS idx_movies_release_date ON movies(release_date);
 
 -- ============================================
 -- Showtimes Table
 -- ============================================
-CREATE TABLE showtimes (
+CREATE TABLE IF NOT EXISTS showtimes (
     id BIGSERIAL PRIMARY KEY,
     movie_id BIGINT NOT NULL,
     screen_id BIGINT NOT NULL,
@@ -229,14 +215,14 @@ CREATE TABLE showtimes (
     CONSTRAINT chk_showtimes_price CHECK (price >= 0)
 );
 
-CREATE INDEX idx_showtimes_movie_id ON showtimes(movie_id);
-CREATE INDEX idx_showtimes_screen_id ON showtimes(screen_id);
-CREATE INDEX idx_showtimes_start_time ON showtimes(start_time);
+CREATE INDEX IF NOT EXISTS idx_showtimes_movie_id ON showtimes(movie_id);
+CREATE INDEX IF NOT EXISTS idx_showtimes_screen_id ON showtimes(screen_id);
+CREATE INDEX IF NOT EXISTS idx_showtimes_start_time ON showtimes(start_time);
 
 -- ============================================
 -- Movie Bookings Table
 -- ============================================
-CREATE TABLE movie_bookings (
+CREATE TABLE IF NOT EXISTS movie_bookings (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     showtime_id BIGINT NOT NULL,
@@ -250,15 +236,15 @@ CREATE TABLE movie_bookings (
     CONSTRAINT chk_movie_bookings_price CHECK (total_price >= 0)
 );
 
-CREATE INDEX idx_movie_bookings_user_id ON movie_bookings(user_id);
-CREATE INDEX idx_movie_bookings_showtime_id ON movie_bookings(showtime_id);
-CREATE INDEX idx_movie_bookings_status ON movie_bookings(status);
-CREATE INDEX idx_movie_bookings_booking_date ON movie_bookings(booking_date);
+CREATE INDEX IF NOT EXISTS idx_movie_bookings_user_id ON movie_bookings(user_id);
+CREATE INDEX IF NOT EXISTS idx_movie_bookings_showtime_id ON movie_bookings(showtime_id);
+CREATE INDEX IF NOT EXISTS idx_movie_bookings_status ON movie_bookings(status);
+CREATE INDEX IF NOT EXISTS idx_movie_bookings_booking_date ON movie_bookings(booking_date);
 
 -- ============================================
 -- Booking Seats Table
 -- ============================================
-CREATE TABLE booking_seats (
+CREATE TABLE IF NOT EXISTS booking_seats (
     id BIGSERIAL PRIMARY KEY,
     booking_id BIGINT NOT NULL,
     seat_id BIGINT NOT NULL,
@@ -270,13 +256,13 @@ CREATE TABLE booking_seats (
     CONSTRAINT chk_booking_seats_price CHECK (price >= 0)
 );
 
-CREATE INDEX idx_booking_seats_booking_id ON booking_seats(booking_id);
-CREATE INDEX idx_booking_seats_seat_id ON booking_seats(seat_id);
+CREATE INDEX IF NOT EXISTS idx_booking_seats_booking_id ON booking_seats(booking_id);
+CREATE INDEX IF NOT EXISTS idx_booking_seats_seat_id ON booking_seats(seat_id);
 
 -- ============================================
 -- Payments Table
 -- ============================================
-CREATE TABLE payments (
+CREATE TABLE IF NOT EXISTS payments (
     id BIGSERIAL PRIMARY KEY,
     booking_id BIGINT NOT NULL,
     booking_type VARCHAR(50) NOT NULL,
@@ -291,10 +277,10 @@ CREATE TABLE payments (
     CONSTRAINT chk_payments_booking_type CHECK (booking_type IN ('MOVIE', 'HOTEL', 'RESTAURANT', 'PARK'))
 );
 
-CREATE INDEX idx_payments_booking_id ON payments(booking_id);
-CREATE INDEX idx_payments_booking_type ON payments(booking_type);
-CREATE INDEX idx_payments_status ON payments(status);
-CREATE INDEX idx_payments_transaction_id ON payments(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_payments_booking_id ON payments(booking_id);
+CREATE INDEX IF NOT EXISTS idx_payments_booking_type ON payments(booking_type);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
+CREATE INDEX IF NOT EXISTS idx_payments_transaction_id ON payments(transaction_id);
 
 -- ============================================
 -- Triggers for updated_at columns
@@ -307,39 +293,66 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+-- Drop existing triggers if they exist and recreate them
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_hotels_updated_at ON hotels;
 CREATE TRIGGER update_hotels_updated_at BEFORE UPDATE ON hotels
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_rooms_updated_at ON rooms;
 CREATE TRIGGER update_rooms_updated_at BEFORE UPDATE ON rooms
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_hotel_bookings_updated_at ON hotel_bookings;
 CREATE TRIGGER update_hotel_bookings_updated_at BEFORE UPDATE ON hotel_bookings
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_cinemas_updated_at ON cinemas;
 CREATE TRIGGER update_cinemas_updated_at BEFORE UPDATE ON cinemas
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_screens_updated_at ON screens;
 CREATE TRIGGER update_screens_updated_at BEFORE UPDATE ON screens
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_seats_updated_at ON seats;
 CREATE TRIGGER update_seats_updated_at BEFORE UPDATE ON seats
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_movies_updated_at ON movies;
 CREATE TRIGGER update_movies_updated_at BEFORE UPDATE ON movies
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_showtimes_updated_at ON showtimes;
 CREATE TRIGGER update_showtimes_updated_at BEFORE UPDATE ON showtimes
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_movie_bookings_updated_at ON movie_bookings;
 CREATE TRIGGER update_movie_bookings_updated_at BEFORE UPDATE ON movie_bookings
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_payments_updated_at ON payments;
 CREATE TRIGGER update_payments_updated_at BEFORE UPDATE ON payments
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================
--- End of Schema
+-- Refresh Token Table (Added for Feature)
+-- ============================================
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expiry_date TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token ON refresh_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id);
+
+-- ============================================
+-- End of Schema Initialization
 -- ============================================

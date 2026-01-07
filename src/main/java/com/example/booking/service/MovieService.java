@@ -4,6 +4,8 @@ import com.example.booking.dto.*;
 import com.example.booking.model.*;
 import com.example.booking.repository.*;
 
+import com.example.booking.exception.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,8 +13,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class MovieService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MovieService.class);
 
     private final MovieRepository movieRepository;
     private final CinemaRepository cinemaRepository;
@@ -35,15 +42,22 @@ public class MovieService {
         this.userRepository = userRepository;
     }
 
+    @org.springframework.cache.annotation.Cacheable("movies")
     public List<MovieDTO> getAllMovies() {
+        logger.info("Fetching all movies");
         return movieRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.cache.annotation.Cacheable(value = "movies", key = "#id")
     public MovieDTO getMovieById(Long id) {
+        logger.debug("Fetching movie with id: {}", id);
         Movie movie = movieRepository.findById(java.util.Objects.requireNonNull(id))
-                .orElseThrow(() -> new RuntimeException("Movie not found"));
+                .orElseThrow(() -> {
+                    logger.error("Movie not found with id: {}", id);
+                    return new ResourceNotFoundException("Movie not found");
+                });
         return convertToDTO(movie);
     }
 
@@ -73,7 +87,7 @@ public class MovieService {
 
     public CinemaDTO getCinemaById(Long id) {
         Cinema cinema = cinemaRepository.findById(java.util.Objects.requireNonNull(id))
-                .orElseThrow(() -> new RuntimeException("Cinema not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cinema not found"));
         return convertToDTO(cinema);
     }
 
@@ -98,17 +112,18 @@ public class MovieService {
 
     @Transactional
     public MovieBookingDTO bookMovie(Long userId, BookMovieRequest request) {
+        logger.info("Processing movie booking for userId: {}, showtimeId: {}", userId, request.getShowtimeId());
         User user = userRepository.findById(java.util.Objects.requireNonNull(userId))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Showtime showtime = showtimeRepository.findById(java.util.Objects.requireNonNull(request.getShowtimeId()))
-                .orElseThrow(() -> new RuntimeException("Showtime not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Showtime not found"));
 
         // Check if seats are available
         List<Long> bookedSeatIds = bookingSeatRepository.findBookedSeatIdsByShowtimeId(request.getShowtimeId());
         for (Long seatId : request.getSeatIds()) {
             if (bookedSeatIds.contains(seatId)) {
-                throw new RuntimeException("Seat " + seatId + " is already booked");
+                throw new ConflictException("Seat " + seatId + " is already booked");
             }
         }
 
@@ -128,7 +143,7 @@ public class MovieService {
         // Create booking seats
         for (Long seatId : request.getSeatIds()) {
             Seat seat = seatRepository.findById(java.util.Objects.requireNonNull(seatId))
-                    .orElseThrow(() -> new RuntimeException("Seat not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Seat not found"));
 
             BookingSeat bookingSeat = new BookingSeat();
             bookingSeat.setBooking(booking);
@@ -148,10 +163,10 @@ public class MovieService {
 
     public MovieBookingDTO getBookingById(Long bookingId, Long userId) {
         MovieBooking booking = movieBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
         if (!booking.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized access to booking");
+            throw new ForbiddenException("Unauthorized access to booking");
         }
 
         return convertToBookingDTO(booking);
@@ -160,14 +175,14 @@ public class MovieService {
     @Transactional
     public MovieBookingDTO cancelBooking(Long bookingId, Long userId) {
         MovieBooking booking = movieBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
         if (!booking.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized access to booking");
+            throw new ForbiddenException("Unauthorized access to booking");
         }
 
         if (!booking.getStatus().equals("PENDING") && !booking.getStatus().equals("CONFIRMED")) {
-            throw new RuntimeException("Cannot cancel booking with status: " + booking.getStatus());
+            throw new BadRequestException("Cannot cancel booking with status: " + booking.getStatus());
         }
 
         booking.setStatus("CANCELLED");

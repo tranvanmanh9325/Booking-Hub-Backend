@@ -4,6 +4,9 @@ import com.example.booking.dto.*;
 import com.example.booking.model.User;
 import com.example.booking.service.HotelService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+
+import org.springframework.validation.annotation.Validated;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/hotels")
 @CrossOrigin(origins = "*")
+@Validated
 public class HotelController {
 
     private final HotelService hotelService;
@@ -30,7 +34,7 @@ public class HotelController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HotelDTO> getHotelById(@PathVariable Long id) {
+    public ResponseEntity<HotelDTO> getHotelById(@PathVariable @Min(1) Long id) {
         return ResponseEntity.ok(hotelService.getHotelById(id));
     }
 
@@ -46,7 +50,7 @@ public class HotelController {
 
     @GetMapping("/{hotelId}/rooms")
     public ResponseEntity<List<RoomDTO>> getRoomsByHotel(
-            @PathVariable Long hotelId,
+            @PathVariable @Min(1) Long hotelId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut,
             @RequestParam(required = false, defaultValue = "1") Integer guests) {
@@ -83,7 +87,7 @@ public class HotelController {
 
     @GetMapping("/bookings/{bookingId}")
     public ResponseEntity<HotelBookingDTO> getBookingById(
-            @PathVariable Long bookingId,
+            @PathVariable @Min(1) Long bookingId,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         if (user == null) {
@@ -94,7 +98,7 @@ public class HotelController {
 
     @PutMapping("/bookings/{bookingId}/cancel")
     public ResponseEntity<HotelBookingDTO> cancelBooking(
-            @PathVariable Long bookingId,
+            @PathVariable @Min(1) Long bookingId,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         if (user == null) {

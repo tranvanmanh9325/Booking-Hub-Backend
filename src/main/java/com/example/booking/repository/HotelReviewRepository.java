@@ -11,11 +11,17 @@ import java.util.Optional;
 
 @Repository
 public interface HotelReviewRepository extends JpaRepository<HotelReview, Long> {
-    
+
     List<HotelReview> findByHotelId(Long hotelId);
-    
+
     Optional<HotelReview> findByHotelIdAndUserId(Long hotelId, Long userId);
-    
+
     @Query("SELECT AVG(hr.rating) FROM HotelReview hr WHERE hr.hotel.id = :hotelId")
     Double getAverageRatingByHotelId(@Param("hotelId") Long hotelId);
+
+    @Query("SELECT new com.example.booking.dto.HotelRatingDTO(hr.hotel.id, AVG(hr.rating)) FROM HotelReview hr GROUP BY hr.hotel.id")
+    List<com.example.booking.dto.HotelRatingDTO> getAllAverageRatings();
+
+    @Query("SELECT new com.example.booking.dto.HotelRatingDTO(hr.hotel.id, AVG(hr.rating)) FROM HotelReview hr WHERE hr.hotel.id IN :hotelIds GROUP BY hr.hotel.id")
+    List<com.example.booking.dto.HotelRatingDTO> getAverageRatingsByHotelIds(@Param("hotelIds") List<Long> hotelIds);
 }
