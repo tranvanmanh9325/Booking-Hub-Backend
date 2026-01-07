@@ -3,7 +3,7 @@ package com.example.booking.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,8 +31,8 @@ public class AuthControllerTest {
         loginRequest.put("password", "wrongpassword");
 
         mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
+                .contentType(java.util.Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                .content(java.util.Objects.requireNonNull(objectMapper.writeValueAsString(loginRequest))))
                 .andExpect(status().isUnauthorized());
         // Note: Actual status depends on implementation, might be 400 or 401
         // Adjusting expectation to what is likely implemented or 4xx

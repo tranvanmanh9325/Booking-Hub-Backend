@@ -4,7 +4,7 @@ import com.example.booking.dto.*;
 import com.example.booking.model.User;
 import com.example.booking.service.HotelService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,49 +15,52 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/hotels")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class HotelController {
-    
+
     private final HotelService hotelService;
-    
+
+    public HotelController(HotelService hotelService) {
+        this.hotelService = hotelService;
+    }
+
     @GetMapping
     public ResponseEntity<List<HotelDTO>> getAllHotels() {
         return ResponseEntity.ok(hotelService.getAllHotels());
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<HotelDTO> getHotelById(@PathVariable Long id) {
         return ResponseEntity.ok(hotelService.getHotelById(id));
     }
-    
+
     @GetMapping("/search")
     public ResponseEntity<List<HotelDTO>> searchHotels(@RequestParam String q) {
         return ResponseEntity.ok(hotelService.searchHotels(q));
     }
-    
+
     @GetMapping("/city/{city}")
     public ResponseEntity<List<HotelDTO>> getHotelsByCity(@PathVariable String city) {
         return ResponseEntity.ok(hotelService.getHotelsByCity(city));
     }
-    
+
     @GetMapping("/{hotelId}/rooms")
     public ResponseEntity<List<RoomDTO>> getRoomsByHotel(
             @PathVariable Long hotelId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut,
             @RequestParam(required = false, defaultValue = "1") Integer guests) {
-        
+
         if (checkIn == null) {
             checkIn = LocalDate.now();
         }
         if (checkOut == null) {
             checkOut = checkIn.plusDays(1);
         }
-        
+
         return ResponseEntity.ok(hotelService.getRoomsByHotel(hotelId, checkIn, checkOut, guests));
     }
-    
+
     @PostMapping("/book")
     public ResponseEntity<HotelBookingDTO> bookHotel(
             @Valid @RequestBody BookHotelRequest request,
@@ -68,7 +71,7 @@ public class HotelController {
         }
         return ResponseEntity.ok(hotelService.bookHotel(user.getId(), request));
     }
-    
+
     @GetMapping("/bookings")
     public ResponseEntity<List<HotelBookingDTO>> getUserBookings(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
@@ -77,7 +80,7 @@ public class HotelController {
         }
         return ResponseEntity.ok(hotelService.getUserBookings(user.getId()));
     }
-    
+
     @GetMapping("/bookings/{bookingId}")
     public ResponseEntity<HotelBookingDTO> getBookingById(
             @PathVariable Long bookingId,
@@ -88,7 +91,7 @@ public class HotelController {
         }
         return ResponseEntity.ok(hotelService.getBookingById(bookingId, user.getId()));
     }
-    
+
     @PutMapping("/bookings/{bookingId}/cancel")
     public ResponseEntity<HotelBookingDTO> cancelBooking(
             @PathVariable Long bookingId,

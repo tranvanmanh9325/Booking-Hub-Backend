@@ -3,7 +3,7 @@ package com.example.booking.service;
 import com.example.booking.dto.*;
 import com.example.booking.model.*;
 import com.example.booking.repository.*;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,9 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class MovieService {
-    
+
     private final MovieRepository movieRepository;
     private final CinemaRepository cinemaRepository;
     private final ShowtimeRepository showtimeRepository;
@@ -22,59 +21,72 @@ public class MovieService {
     private final MovieBookingRepository movieBookingRepository;
     private final BookingSeatRepository bookingSeatRepository;
     private final UserRepository userRepository;
-    
+
+    public MovieService(MovieRepository movieRepository, CinemaRepository cinemaRepository,
+            ShowtimeRepository showtimeRepository, SeatRepository seatRepository,
+            MovieBookingRepository movieBookingRepository, BookingSeatRepository bookingSeatRepository,
+            UserRepository userRepository) {
+        this.movieRepository = movieRepository;
+        this.cinemaRepository = cinemaRepository;
+        this.showtimeRepository = showtimeRepository;
+        this.seatRepository = seatRepository;
+        this.movieBookingRepository = movieBookingRepository;
+        this.bookingSeatRepository = bookingSeatRepository;
+        this.userRepository = userRepository;
+    }
+
     public List<MovieDTO> getAllMovies() {
         return movieRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public MovieDTO getMovieById(Long id) {
-        Movie movie = movieRepository.findById(id)
+        Movie movie = movieRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
         return convertToDTO(movie);
     }
-    
+
     public List<MovieDTO> searchMovies(String query) {
         return movieRepository.findByTitleContainingIgnoreCase(query).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public List<MovieDTO> getMoviesByGenre(String genre) {
         return movieRepository.findByGenre(genre).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public List<MovieDTO> getNowShowing() {
         return movieRepository.findNowShowing().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public List<CinemaDTO> getAllCinemas() {
         return cinemaRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public CinemaDTO getCinemaById(Long id) {
-        Cinema cinema = cinemaRepository.findById(id)
+        Cinema cinema = cinemaRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Cinema not found"));
         return convertToDTO(cinema);
     }
-    
+
     public List<ShowtimeDTO> getShowtimesByMovie(Long movieId) {
         return showtimeRepository.findByMovieId(movieId).stream()
                 .map(this::convertToShowtimeDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public List<SeatDTO> getSeatsByScreen(Long screenId, Long showtimeId) {
         List<Seat> seats = seatRepository.findByScreenId(screenId);
         List<Long> bookedSeatIds = bookingSeatRepository.findBookedSeatIdsByShowtimeId(showtimeId);
-        
+
         return seats.stream()
                 .map(seat -> {
                     SeatDTO dto = convertToSeatDTO(seat);
@@ -83,15 +95,15 @@ public class MovieService {
                 })
                 .collect(Collectors.toList());
     }
-    
+
     @Transactional
     public MovieBookingDTO bookMovie(Long userId, BookMovieRequest request) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(java.util.Objects.requireNonNull(userId))
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        Showtime showtime = showtimeRepository.findById(request.getShowtimeId())
+
+        Showtime showtime = showtimeRepository.findById(java.util.Objects.requireNonNull(request.getShowtimeId()))
                 .orElseThrow(() -> new RuntimeException("Showtime not found"));
-        
+
         // Check if seats are available
         List<Long> bookedSeatIds = bookingSeatRepository.findBookedSeatIdsByShowtimeId(request.getShowtimeId());
         for (Long seatId : request.getSeatIds()) {
@@ -99,71 +111,71 @@ public class MovieService {
                 throw new RuntimeException("Seat " + seatId + " is already booked");
             }
         }
-        
+
         // Create booking
         MovieBooking booking = new MovieBooking();
         booking.setUser(user);
         booking.setShowtime(showtime);
         booking.setBookingDate(LocalDateTime.now());
         booking.setStatus("PENDING");
-        
+
         // Calculate total price
         double totalPrice = showtime.getPrice() * request.getSeatIds().size();
         booking.setTotalPrice(totalPrice);
-        
+
         booking = movieBookingRepository.save(booking);
-        
+
         // Create booking seats
         for (Long seatId : request.getSeatIds()) {
-            Seat seat = seatRepository.findById(seatId)
+            Seat seat = seatRepository.findById(java.util.Objects.requireNonNull(seatId))
                     .orElseThrow(() -> new RuntimeException("Seat not found"));
-            
+
             BookingSeat bookingSeat = new BookingSeat();
             bookingSeat.setBooking(booking);
             bookingSeat.setSeat(seat);
             bookingSeat.setPrice(showtime.getPrice());
             bookingSeatRepository.save(bookingSeat);
         }
-        
+
         return convertToBookingDTO(booking);
     }
-    
+
     public List<MovieBookingDTO> getUserBookings(Long userId) {
         return movieBookingRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(this::convertToBookingDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public MovieBookingDTO getBookingById(Long bookingId, Long userId) {
-        MovieBooking booking = movieBookingRepository.findById(bookingId)
+        MovieBooking booking = movieBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
-        
+
         if (!booking.getUser().getId().equals(userId)) {
             throw new RuntimeException("Unauthorized access to booking");
         }
-        
+
         return convertToBookingDTO(booking);
     }
-    
+
     @Transactional
     public MovieBookingDTO cancelBooking(Long bookingId, Long userId) {
-        MovieBooking booking = movieBookingRepository.findById(bookingId)
+        MovieBooking booking = movieBookingRepository.findById(java.util.Objects.requireNonNull(bookingId))
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
-        
+
         if (!booking.getUser().getId().equals(userId)) {
             throw new RuntimeException("Unauthorized access to booking");
         }
-        
+
         if (!booking.getStatus().equals("PENDING") && !booking.getStatus().equals("CONFIRMED")) {
             throw new RuntimeException("Cannot cancel booking with status: " + booking.getStatus());
         }
-        
+
         booking.setStatus("CANCELLED");
         booking = movieBookingRepository.save(booking);
-        
+
         return convertToBookingDTO(booking);
     }
-    
+
     // Helper methods
     private MovieDTO convertToDTO(Movie movie) {
         return new MovieDTO(
@@ -175,10 +187,9 @@ public class MovieService {
                 movie.getRating(),
                 movie.getPosterUrl(),
                 movie.getTrailerUrl(),
-                movie.getReleaseDate()
-        );
+                movie.getReleaseDate());
     }
-    
+
     private CinemaDTO convertToDTO(Cinema cinema) {
         return new CinemaDTO(
                 cinema.getId(),
@@ -186,10 +197,9 @@ public class MovieService {
                 cinema.getAddress(),
                 cinema.getCity(),
                 cinema.getFacilities(),
-                cinema.getPhoneNumber()
-        );
+                cinema.getPhoneNumber());
     }
-    
+
     private ShowtimeDTO convertToShowtimeDTO(Showtime showtime) {
         return new ShowtimeDTO(
                 showtime.getId(),
@@ -201,10 +211,9 @@ public class MovieService {
                 showtime.getScreen().getCinema().getName(),
                 showtime.getStartTime(),
                 showtime.getEndTime(),
-                showtime.getPrice()
-        );
+                showtime.getPrice());
     }
-    
+
     private SeatDTO convertToSeatDTO(Seat seat) {
         return new SeatDTO(
                 seat.getId(),
@@ -212,15 +221,14 @@ public class MovieService {
                 seat.getRow(),
                 seat.getNumber(),
                 seat.getSeatType(),
-                false
-        );
+                false);
     }
-    
+
     private MovieBookingDTO convertToBookingDTO(MovieBooking booking) {
         List<SeatDTO> seatDTOs = booking.getBookingSeats().stream()
                 .map(bs -> convertToSeatDTO(bs.getSeat()))
                 .collect(Collectors.toList());
-        
+
         return new MovieBookingDTO(
                 booking.getId(),
                 booking.getUser().getId(),
@@ -232,7 +240,6 @@ public class MovieService {
                 booking.getBookingDate(),
                 booking.getStatus(),
                 booking.getTotalPrice(),
-                seatDTOs
-        );
+                seatDTOs);
     }
 }

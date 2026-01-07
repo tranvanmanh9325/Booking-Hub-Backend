@@ -1,6 +1,5 @@
 package com.example.booking.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,26 +20,33 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
-    
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api/health").permitAll()
-                .requestMatchers("/api/partnership/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/movies/**", "/api/cinemas/**", "/api/hotels/**").permitAll()
-                .requestMatchers("/api/movies/book", "/api/movies/bookings/**", "/api/hotels/book", "/api/hotels/bookings/**").authenticated()
-                .requestMatchers("/api/payments/**").authenticated()
-                .anyRequest().authenticated()
-            );
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                                "/api/health")
+                        .permitAll()
+                        .requestMatchers("/api/partnership/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/movies/**", "/api/cinemas/**", "/api/hotels/**")
+                        .permitAll()
+                        .requestMatchers("/api/movies/book", "/api/movies/bookings/**", "/api/hotels/book",
+                                "/api/hotels/bookings/**")
+                        .authenticated()
+                        .requestMatchers("/api/payments/**").authenticated()
+                        .anyRequest().authenticated());
         return http.build();
     }
 
@@ -51,7 +57,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
