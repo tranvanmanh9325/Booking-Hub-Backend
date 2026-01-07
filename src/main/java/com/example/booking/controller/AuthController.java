@@ -2,6 +2,7 @@ package com.example.booking.controller;
 
 import com.example.booking.dto.AuthRequest;
 import com.example.booking.dto.AuthResponse;
+import com.example.booking.dto.GoogleAuthRequest;
 import com.example.booking.dto.RegisterRequest;
 import com.example.booking.service.AuthService;
 import jakarta.validation.Valid;
@@ -27,5 +28,15 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> googleAuth(@RequestBody GoogleAuthRequest request) {
+        try {
+            AuthResponse response = authService.googleAuth(request);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

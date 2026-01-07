@@ -2,6 +2,7 @@ package com.example.booking.service;
 
 import com.example.booking.dto.AuthRequest;
 import com.example.booking.dto.AuthResponse;
+import com.example.booking.dto.GoogleAuthRequest;
 import com.example.booking.dto.RegisterRequest;
 import com.example.booking.model.User;
 import com.example.booking.repository.UserRepository;
@@ -49,6 +50,43 @@ public class AuthService {
         
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid email or password");
+        }
+        
+        String token = jwtUtil.generateToken(user.getEmail());
+        
+        return new AuthResponse(token, "Bearer", user.getId(), user.getEmail(), user.getFullName());
+    }
+    
+    @Transactional
+    public AuthResponse googleAuth(GoogleAuthRequest request) {
+        if (request.getEmail() == null || request.getEmail().isEmpty()) {
+            throw new RuntimeException("Email is required");
+        }
+        
+        // Check if user exists by email
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+        
+        if (user == null) {
+            // Create new user for Google OAuth
+            user = new User();
+            user.setEmail(request.getEmail());
+            user.setFullName(request.getName() != null ? request.getName() : request.getEmail());
+            user.setAvatarUrl(request.getPicture());
+            // Generate a random password for Google users (they won't use it)
+            user.setPassword(passwordEncoder.encode("GOOGLE_OAUTH_" + System.currentTimeMillis()));
+            
+            user = userRepository.save(user);
+        } else {
+            // Update existing user's avatar if provided
+            if (request.getPicture() != null && !request.getPicture().isEmpty()) {
+                user.setAvatarUrl(request.getPicture());
+            }
+            // Update name if provided and different
+            if (request.getName() != null && !request.getName().isEmpty() 
+                && !request.getName().equals(user.getFullName())) {
+                user.setFullName(request.getName());
+            }
+            user = userRepository.save(user);
         }
         
         String token = jwtUtil.generateToken(user.getEmail());
