@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
+@Transactional(readOnly = true)
 public class MovieService {
 
     private static final Logger logger = LoggerFactory.getLogger(MovieService.class);

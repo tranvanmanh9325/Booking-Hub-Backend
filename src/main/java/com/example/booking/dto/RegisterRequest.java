@@ -3,7 +3,13 @@ package com.example.booking.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.example.booking.validation.PhoneNumber;
+import com.example.booking.validation.StrongPassword;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class RegisterRequest {
 
     @NotBlank(message = "Email is required")
@@ -12,11 +18,13 @@ public class RegisterRequest {
 
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
+    @StrongPassword
     private String password;
 
     @NotBlank(message = "Full name is required")
     private String fullName;
 
+    @PhoneNumber(message = "Invalid phone number format. Must be 10 digits starting with 0.")
     private String phone;
 
     public RegisterRequest() {
@@ -26,38 +34,6 @@ public class RegisterRequest {
         this.email = email;
         this.password = password;
         this.fullName = fullName;
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
         this.phone = phone;
     }
 

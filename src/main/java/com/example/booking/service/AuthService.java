@@ -68,6 +68,7 @@ public class AuthService {
                 user.getFullName());
     }
 
+    @Transactional
     public AuthResponse login(AuthRequest request) {
         logger.info("Authenticating user with email: {}", request.getEmail());
         User user = userRepository.findByEmail(request.getEmail())
@@ -124,6 +125,7 @@ public class AuthService {
                 user.getFullName());
     }
 
+    @Transactional
     public AuthResponse refreshToken(RefreshTokenRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 

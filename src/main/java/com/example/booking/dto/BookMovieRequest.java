@@ -2,12 +2,17 @@ package com.example.booking.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
 public class BookMovieRequest {
 
     @NotNull(message = "Showtime ID is required")
+    @jakarta.validation.constraints.Min(value = 1, message = "Showtime ID must be positive")
     private Long showtimeId;
 
     @NotEmpty(message = "At least one seat must be selected")
@@ -18,22 +23,6 @@ public class BookMovieRequest {
 
     public BookMovieRequest(Long showtimeId, List<Long> seatIds) {
         this.showtimeId = showtimeId;
-        this.seatIds = seatIds;
-    }
-
-    public Long getShowtimeId() {
-        return showtimeId;
-    }
-
-    public void setShowtimeId(Long showtimeId) {
-        this.showtimeId = showtimeId;
-    }
-
-    public List<Long> getSeatIds() {
-        return seatIds;
-    }
-
-    public void setSeatIds(List<Long> seatIds) {
         this.seatIds = seatIds;
     }
 

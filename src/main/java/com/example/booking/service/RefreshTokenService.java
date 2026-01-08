@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional(readOnly = true)
 public class RefreshTokenService {
     @Value("${jwt.refreshExpirationMs}")
     private Long refreshTokenDurationMs;
@@ -29,6 +30,7 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
+    @Transactional
     public RefreshToken createRefreshToken(Long userId) {
         RefreshToken refreshToken = new RefreshToken();
 
@@ -40,6 +42,7 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
+    @Transactional
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);

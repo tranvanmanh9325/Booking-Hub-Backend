@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
+@Transactional(readOnly = true)
 public class HotelService {
 
     private static final Logger logger = LoggerFactory.getLogger(HotelService.class);

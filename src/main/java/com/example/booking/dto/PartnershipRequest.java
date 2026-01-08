@@ -2,6 +2,7 @@ package com.example.booking.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import com.example.booking.validation.PhoneNumber;
 
 public class PartnershipRequest {
 
@@ -13,6 +14,7 @@ public class PartnershipRequest {
     private String email;
 
     @NotBlank(message = "Phone is required")
+    @PhoneNumber(message = "Invalid phone number format. Must be 10 digits starting with 0.")
     private String phone;
 
     private String company;

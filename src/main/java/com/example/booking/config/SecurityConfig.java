@@ -17,7 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import com.example.booking.filter.MdcLoggingFilter;
+import com.example.booking.security.RateLimitFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,12 +29,15 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final com.example.booking.security.RateLimitFilter rateLimitFilter;
+    private final RateLimitFilter rateLimitFilter;
+    private final MdcLoggingFilter mdcLoggingFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-            com.example.booking.security.RateLimitFilter rateLimitFilter) {
+            RateLimitFilter rateLimitFilter,
+            MdcLoggingFilter mdcLoggingFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.rateLimitFilter = rateLimitFilter;
+        this.mdcLoggingFilter = mdcLoggingFilter;
     }
 
     @Bean
@@ -41,6 +46,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(mdcLoggingFilter, SecurityContextHolderFilter.class)
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth

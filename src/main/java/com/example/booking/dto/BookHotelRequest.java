@@ -6,12 +6,21 @@ import jakarta.validation.constraints.Future;
 
 import java.time.LocalDate;
 
+import com.example.booking.validation.DateRange;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@DateRange(start = "checkIn", end = "checkOut")
 public class BookHotelRequest {
 
     @NotNull(message = "Hotel ID is required")
+    @jakarta.validation.constraints.Min(value = 1, message = "Hotel ID must be positive")
     private Long hotelId;
 
     @NotNull(message = "Room ID is required")
+    @jakarta.validation.constraints.Min(value = 1, message = "Room ID must be positive")
     private Long roomId;
 
     @NotNull(message = "Check-in date is required")
@@ -34,46 +43,6 @@ public class BookHotelRequest {
         this.roomId = roomId;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
-        this.guests = guests;
-    }
-
-    public Long getHotelId() {
-        return hotelId;
-    }
-
-    public void setHotelId(Long hotelId) {
-        this.hotelId = hotelId;
-    }
-
-    public Long getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
-    }
-
-    public LocalDate getCheckIn() {
-        return checkIn;
-    }
-
-    public void setCheckIn(LocalDate checkIn) {
-        this.checkIn = checkIn;
-    }
-
-    public LocalDate getCheckOut() {
-        return checkOut;
-    }
-
-    public void setCheckOut(LocalDate checkOut) {
-        this.checkOut = checkOut;
-    }
-
-    public Integer getGuests() {
-        return guests;
-    }
-
-    public void setGuests(Integer guests) {
         this.guests = guests;
     }
 
