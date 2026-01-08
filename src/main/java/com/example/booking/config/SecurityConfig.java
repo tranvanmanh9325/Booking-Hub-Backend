@@ -55,16 +55,16 @@ public class SecurityConfig {
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
-                                "/api/health")
+                        .requestMatchers("/api/v1/auth/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                                "/api/v1/health")
                         .permitAll()
-                        .requestMatchers("/api/partnership/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/movies/**", "/api/cinemas/**", "/api/hotels/**")
+                        .requestMatchers("/api/v1/partnerships/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/movies/**", "/api/v1/cinemas/**", "/api/v1/hotels/**")
                         .permitAll()
-                        .requestMatchers("/api/movies/book", "/api/movies/bookings/**", "/api/hotels/book",
-                                "/api/hotels/bookings/**")
+                        .requestMatchers("/api/v1/movies/book", "/api/v1/movies/bookings/**", "/api/v1/hotels/book",
+                                "/api/v1/hotels/bookings/**")
                         .authenticated()
-                        .requestMatchers("/api/payments/**").authenticated()
+                        .requestMatchers("/api/v1/payments/**").authenticated()
                         .anyRequest().authenticated());
         return http.build();
     }

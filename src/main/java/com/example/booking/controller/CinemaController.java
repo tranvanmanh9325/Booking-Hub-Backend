@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Min;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cinemas")
+@RequestMapping("/api/v1/cinemas")
 @CrossOrigin(origins = "*")
 @Validated
 public class CinemaController {

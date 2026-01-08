@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/hotels")
+@RequestMapping("/api/v1/hotels")
 @CrossOrigin(origins = "*")
 @Validated
 public class HotelController {

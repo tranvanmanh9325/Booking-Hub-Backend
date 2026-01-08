@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/partnership")
+@RequestMapping("/api/v1/partnerships")
 @CrossOrigin(origins = "*")
 public class PartnershipController {
 
