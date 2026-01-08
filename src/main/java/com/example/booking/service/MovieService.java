@@ -13,6 +13,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +34,12 @@ public class MovieService {
     private final BookingSeatRepository bookingSeatRepository;
     private final UserRepository userRepository;
 
+    private final EmailService emailService;
+
     public MovieService(MovieRepository movieRepository, CinemaRepository cinemaRepository,
             ShowtimeRepository showtimeRepository, SeatRepository seatRepository,
             MovieBookingRepository movieBookingRepository, BookingSeatRepository bookingSeatRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, EmailService emailService) {
         this.movieRepository = movieRepository;
         this.cinemaRepository = cinemaRepository;
         this.showtimeRepository = showtimeRepository;
@@ -41,14 +47,14 @@ public class MovieService {
         this.movieBookingRepository = movieBookingRepository;
         this.bookingSeatRepository = bookingSeatRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
-    @org.springframework.cache.annotation.Cacheable("movies")
-    public List<MovieDTO> getAllMovies() {
-        logger.info("Fetching all movies");
-        return movieRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    @org.springframework.cache.annotation.Cacheable(value = "movies", key = "#page + '-' + #size")
+    public Page<MovieDTO> getAllMovies(int page, int size) {
+        logger.info("Fetching movies page: {}, size: {}", page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return movieRepository.findAll(pageable).map(this::convertToDTO);
     }
 
     @org.springframework.cache.annotation.Cacheable(value = "movies", key = "#id")
@@ -141,6 +147,12 @@ public class MovieService {
 
         booking = movieBookingRepository.save(booking);
 
+        try {
+            emailService.sendMovieBookingConfirmation(user.getEmail(), user.getFullName(), booking);
+        } catch (Exception e) {
+            logger.error("Failed to send movie booking confirmation", e);
+        }
+
         // Create booking seats
         for (Long seatId : request.getSeatIds()) {
             Seat seat = seatRepository.findById(java.util.Objects.requireNonNull(seatId))
@@ -188,6 +200,13 @@ public class MovieService {
 
         booking.setStatus("CANCELLED");
         booking = movieBookingRepository.save(booking);
+
+        try {
+            emailService.sendBookingCancellation(booking.getUser().getEmail(), booking.getUser().getFullName(),
+                    booking.getId(), booking.getShowtime().getMovie().getTitle());
+        } catch (Exception e) {
+            logger.error("Failed to send movie cancellation email", e);
+        }
 
         return convertToBookingDTO(booking);
     }

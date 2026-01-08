@@ -14,6 +14,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,27 +33,33 @@ public class HotelService {
     private final HotelReviewRepository hotelReviewRepository;
     private final UserRepository userRepository;
 
+    private final EmailService emailService;
+
     public HotelService(HotelRepository hotelRepository, RoomRepository roomRepository,
             HotelBookingRepository hotelBookingRepository, HotelReviewRepository hotelReviewRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, EmailService emailService) {
         this.hotelRepository = hotelRepository;
         this.roomRepository = roomRepository;
         this.hotelBookingRepository = hotelBookingRepository;
         this.hotelReviewRepository = hotelReviewRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
-    @org.springframework.cache.annotation.Cacheable("hotels")
-    public List<HotelDTO> getAllHotels() {
-        logger.info("Fetching all hotels");
-        List<Hotel> hotels = hotelRepository.findAll();
-        List<HotelRatingDTO> ratings = hotelReviewRepository.getAllAverageRatings();
+    // ... existing code ...
+
+    @org.springframework.cache.annotation.Cacheable(value = "hotels", key = "#page + '-' + #size")
+    public Page<HotelDTO> getAllHotels(int page, int size) {
+        logger.info("Fetching hotels page: {}, size: {}", page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Hotel> hotelPage = hotelRepository.findAll(pageable);
+
+        List<Long> hotelIds = hotelPage.getContent().stream().map(Hotel::getId).collect(Collectors.toList());
+        List<HotelRatingDTO> ratings = hotelReviewRepository.getAverageRatingsByHotelIds(hotelIds);
         java.util.Map<Long, Double> ratingMap = ratings.stream()
                 .collect(Collectors.toMap(HotelRatingDTO::getHotelId, HotelRatingDTO::getAverageRating));
 
-        return hotels.stream()
-                .map(hotel -> convertToDTO(hotel, ratingMap.get(hotel.getId())))
-                .collect(Collectors.toList());
+        return hotelPage.map(hotel -> convertToDTO(hotel, ratingMap.get(hotel.getId())));
     }
 
     @org.springframework.cache.annotation.Cacheable(value = "hotels", key = "#id")
@@ -162,6 +172,12 @@ public class HotelService {
 
         booking = hotelBookingRepository.save(booking);
 
+        try {
+            emailService.sendHotelBookingConfirmation(user.getEmail(), user.getFullName(), booking);
+        } catch (Exception e) {
+            logger.error("Failed to send hotel booking confirmation", e);
+        }
+
         return convertToBookingDTO(booking);
     }
 
@@ -197,6 +213,13 @@ public class HotelService {
 
         booking.setStatus("CANCELLED");
         booking = hotelBookingRepository.save(booking);
+
+        try {
+            emailService.sendBookingCancellation(booking.getUser().getEmail(), booking.getUser().getFullName(),
+                    booking.getId(), booking.getHotel().getName());
+        } catch (Exception e) {
+            logger.error("Failed to send hotel cancellation email", e);
+        }
 
         return convertToBookingDTO(booking);
     }

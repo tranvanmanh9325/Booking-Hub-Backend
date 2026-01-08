@@ -13,6 +13,7 @@ import com.example.booking.exception.BadRequestException;
 import com.example.booking.exception.ConflictException;
 import com.example.booking.exception.TokenRefreshException;
 import com.example.booking.exception.UnauthorizedException;
+import com.example.booking.exception.ResourceNotFoundException;
 import com.example.booking.model.RefreshToken;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,13 +32,15 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
+    private final EmailService emailService;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
-            RefreshTokenService refreshTokenService) {
+            RefreshTokenService refreshTokenService, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -60,6 +63,14 @@ public class AuthService {
         user.setPhone(request.getPhone());
 
         user = userRepository.save(user);
+
+        // Send confirmation email
+        try {
+            emailService.sendRegistrationConfirmation(user.getEmail(), user.getFullName());
+        } catch (Exception e) {
+            logger.error("Failed to send registration email to {}", user.getEmail(), e);
+            // Don't rollback registration if email fails
+        }
 
         String token = jwtUtil.generateToken(user.getEmail());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
@@ -105,6 +116,13 @@ public class AuthService {
             user.setPassword(passwordEncoder.encode("GOOGLE_OAUTH_" + System.currentTimeMillis()));
 
             user = userRepository.save(user);
+
+            // Send confirmation email for new Google users
+            try {
+                emailService.sendRegistrationConfirmation(user.getEmail(), user.getFullName());
+            } catch (Exception e) {
+                logger.error("Failed to send registration email to Google user {}", user.getEmail(), e);
+            }
         } else {
             // Update existing user's avatar if provided
             if (request.getPicture() != null && !request.getPicture().isEmpty()) {
@@ -139,5 +157,36 @@ public class AuthService {
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                         "Refresh token is not in database!"));
+    }
+
+    @Transactional
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+
+        String token = java.util.UUID.randomUUID().toString();
+        user.setResetPasswordToken(token);
+        // Token expires in 1 hour
+        user.setResetPasswordTokenExpiry(java.time.LocalDateTime.now().plusHours(1));
+        userRepository.save(user);
+
+        String resetUrl = "http://localhost:3000/auth/reset-password?token=" + token;
+
+        emailService.sendPasswordResetEmail(user.getEmail(), resetUrl);
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByResetPasswordToken(token)
+                .orElseThrow(() -> new BadRequestException("Invalid password reset token"));
+
+        if (user.getResetPasswordTokenExpiry().isBefore(java.time.LocalDateTime.now())) {
+            throw new BadRequestException("Token expired");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null);
+        user.setResetPasswordTokenExpiry(null);
+        userRepository.save(user);
     }
 }

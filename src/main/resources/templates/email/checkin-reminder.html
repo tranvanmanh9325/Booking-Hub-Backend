@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nhắc Nhở: Sắp Đến Giờ Check-in</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #f59e0b;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .reminder-box {
+            background-color: #fffbeb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Nhắc Nhở Chuyến Đi</h1>
+        </div>
+        <div class="content">
+            <p>Xin chào <span th:text="${name}">Khách hàng</span>,</p>
+            <p>Chỉ còn ít thời gian nữa là đến giờ check-in booking của bạn tại Booking Hub!</p>
+
+            <div class="reminder-box">
+                <h3>Thông tin nhắc nhở:</h3>
+                <p><strong>Dịch vụ:</strong> <span th:text="${serviceName}">Tên Khách sạn/Phim</span></p>
+                <p><strong>Thời gian check-in:</strong> <span th:text="${checkInTime}">Ngày giờ</span></p>
+                <p><strong>Mã đặt chỗ:</strong> #<span th:text="${bookingId}">12345</span></p>
+                <p><strong>Địa điểm:</strong> <a th:href="@{${mapLink}}" th:text="${location}">Xem bản đồ</a></p>
+            </div>
+
+            <p>Đừng quên mang theo giấy tờ tùy thân và mã đặt chỗ nhé!</p>
+            <p>Chúc bạn có những trải nghiệm tuyệt vời.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Booking Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>

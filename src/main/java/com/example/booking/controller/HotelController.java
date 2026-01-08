@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Min;
 
 import org.springframework.validation.annotation.Validated;
 
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,8 +30,10 @@ public class HotelController {
     }
 
     @GetMapping
-    public ResponseEntity<List<HotelDTO>> getAllHotels() {
-        return ResponseEntity.ok(hotelService.getAllHotels());
+    public ResponseEntity<Page<HotelDTO>> getAllHotels(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(hotelService.getAllHotels(page, size));
     }
 
     @GetMapping("/{id}")

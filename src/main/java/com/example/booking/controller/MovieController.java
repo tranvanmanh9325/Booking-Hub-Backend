@@ -6,6 +6,7 @@ import com.example.booking.service.MovieService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 
+import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,10 @@ public class MovieController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MovieDTO>> getAllMovies() {
-        return ResponseEntity.ok(movieService.getAllMovies());
+    public ResponseEntity<Page<MovieDTO>> getAllMovies(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(movieService.getAllMovies(page, size));
     }
 
     @GetMapping("/{id}")

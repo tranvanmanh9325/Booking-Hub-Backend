@@ -33,4 +33,7 @@ public interface HotelBookingRepository extends JpaRepository<HotelBooking, Long
        List<HotelBooking> findConflictingBookingsForRooms(@Param("roomIds") List<Long> roomIds,
                      @Param("checkIn") LocalDate checkIn,
                      @Param("checkOut") LocalDate checkOut);
+
+       @Query("SELECT hb FROM HotelBooking hb WHERE hb.checkIn = :checkIn AND hb.status = :status")
+       List<HotelBooking> findByCheckInAndStatus(@Param("checkIn") LocalDate checkIn, @Param("status") String status);
 }
