@@ -14,7 +14,8 @@ public interface HotelBookingRepository extends JpaRepository<HotelBooking, Long
 
        List<HotelBooking> findByUserId(Long userId);
 
-       List<HotelBooking> findByUserIdOrderByCreatedAtDesc(Long userId);
+       @Query("SELECT hb FROM HotelBooking hb LEFT JOIN FETCH hb.hotel LEFT JOIN FETCH hb.room WHERE hb.user.id = :userId ORDER BY hb.createdAt DESC")
+       List<HotelBooking> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
 
        @Query("SELECT hb FROM HotelBooking hb WHERE hb.room.id = :roomId " +
                      "AND hb.status IN ('PENDING', 'CONFIRMED') " +

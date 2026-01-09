@@ -8,6 +8,8 @@ import com.example.booking.dto.RegisterRequest;
 import com.example.booking.service.AuthService;
 import jakarta.validation.Valid;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,10 @@ public class AuthController {
 
     private final AuthService authService;
 
+    // Cookie duration matching refresh token validity (e.g., 7 days)
+    // You might want to move this to properties or constant
+    private static final long REFRESH_TOKEN_DURATION_SECONDS = 7 * 24 * 60 * 60;
+
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
@@ -25,28 +31,67 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
-        return ResponseEntity.ok(response);
+        ResponseCookie cookie = createRefreshTokenCookie(response.getRefreshToken());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         AuthResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+        ResponseCookie cookie = createRefreshTokenCookie(response.getRefreshToken());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
     }
 
     @PostMapping("/google")
     public ResponseEntity<AuthResponse> googleAuth(@RequestBody GoogleAuthRequest request) {
         try {
             AuthResponse response = authService.googleAuth(request);
-            return ResponseEntity.ok(response);
+            ResponseCookie cookie = createRefreshTokenCookie(response.getRefreshToken());
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(authService.refreshToken(request));
+    public ResponseEntity<AuthResponse> refreshToken(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken) {
+
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        RefreshTokenRequest request = new RefreshTokenRequest();
+        request.setRefreshToken(refreshToken);
+
+        AuthResponse response = authService.refreshToken(request);
+
+        // Rotate refresh token in cookie as well
+        ResponseCookie cookie = createRefreshTokenCookie(response.getRefreshToken());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false) // Set to true in production with HTTPS
+                .path("/")
+                .maxAge(0) // Expire immediately
+                .sameSite("Strict")
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body("Logged out successfully");
     }
 
     @PostMapping("/forgot-password")
@@ -62,5 +107,16 @@ public class AuthController {
         String newPassword = request.get("newPassword");
         authService.resetPassword(token, newPassword);
         return ResponseEntity.ok().body("Password has been reset successfully");
+    }
+
+    private ResponseCookie createRefreshTokenCookie(String refreshToken) {
+        return ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false) // Set to true in production (checking if request is secure is better but this
+                               // is explicit)
+                .path("/")
+                .maxAge(REFRESH_TOKEN_DURATION_SECONDS)
+                .sameSite("Strict")
+                .build();
     }
 }

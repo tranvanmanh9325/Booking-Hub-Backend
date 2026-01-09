@@ -21,8 +21,7 @@ public class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void testLoginFailure() throws Exception {
@@ -30,7 +29,7 @@ public class AuthControllerTest {
         loginRequest.put("email", "wrong@email.com");
         loginRequest.put("password", "wrongpassword");
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(java.util.Objects.requireNonNull(MediaType.APPLICATION_JSON))
                 .content(java.util.Objects.requireNonNull(objectMapper.writeValueAsString(loginRequest))))
                 .andExpect(status().isUnauthorized());

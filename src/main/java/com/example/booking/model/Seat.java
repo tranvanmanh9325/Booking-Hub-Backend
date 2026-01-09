@@ -16,7 +16,7 @@ public class Seat {
     @JoinColumn(name = "screen_id", nullable = false)
     private Screen screen;
 
-    @Column(nullable = false)
+    @Column(name = "\"row\"", nullable = false)
     private String row; // A, B, C, etc.
 
     @Column(nullable = false)

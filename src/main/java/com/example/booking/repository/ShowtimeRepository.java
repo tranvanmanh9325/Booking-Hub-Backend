@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ShowtimeRepository extends JpaRepository<Showtime, Long> {
 
-    @Query("SELECT s FROM Showtime s JOIN FETCH s.screen sc JOIN FETCH sc.cinema WHERE s.movie.id = :movieId")
+    @Query("SELECT s FROM Showtime s JOIN FETCH s.screen sc JOIN FETCH sc.cinema JOIN FETCH s.movie WHERE s.movie.id = :movieId")
     List<Showtime> findByMovieId(@Param("movieId") Long movieId);
 
     List<Showtime> findByScreenId(Long screenId);

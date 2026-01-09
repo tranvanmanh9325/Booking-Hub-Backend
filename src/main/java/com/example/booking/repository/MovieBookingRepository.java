@@ -11,7 +11,9 @@ public interface MovieBookingRepository extends JpaRepository<MovieBooking, Long
 
     List<MovieBooking> findByUserId(Long userId);
 
-    List<MovieBooking> findByUserIdOrderByCreatedAtDesc(Long userId);
+    @org.springframework.data.jpa.repository.Query("SELECT mb FROM MovieBooking mb JOIN FETCH mb.showtime s JOIN FETCH s.movie JOIN FETCH s.screen sc JOIN FETCH sc.cinema WHERE mb.user.id = :userId ORDER BY mb.createdAt DESC")
+    List<MovieBooking> findByUserIdOrderByCreatedAtDesc(
+            @org.springframework.data.repository.query.Param("userId") Long userId);
 
     List<MovieBooking> findByShowtimeId(Long showtimeId);
 

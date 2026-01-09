@@ -10,9 +10,9 @@ import java.util.List;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    
+
     List<Room> findByHotelId(Long hotelId);
-    
-    @Query("SELECT r FROM Room r WHERE r.hotel.id = :hotelId AND r.maxGuests >= :guests")
+
+    @Query("SELECT DISTINCT r FROM Room r LEFT JOIN FETCH r.images WHERE r.hotel.id = :hotelId AND r.maxGuests >= :guests")
     List<Room> findAvailableRoomsByHotelAndGuests(@Param("hotelId") Long hotelId, @Param("guests") Integer guests);
 }
