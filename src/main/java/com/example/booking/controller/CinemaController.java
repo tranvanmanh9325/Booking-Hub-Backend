@@ -1,7 +1,7 @@
 package com.example.booking.controller;
 
 import com.example.booking.dto.CinemaDTO;
-import com.example.booking.service.MovieService;
+import com.example.booking.service.SearchService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,19 +16,19 @@ import java.util.List;
 @Validated
 public class CinemaController {
 
-    private final MovieService movieService;
+    private final SearchService searchService;
 
-    public CinemaController(MovieService movieService) {
-        this.movieService = movieService;
+    public CinemaController(SearchService searchService) {
+        this.searchService = searchService;
     }
 
     @GetMapping
     public ResponseEntity<List<CinemaDTO>> getAllCinemas() {
-        return ResponseEntity.ok(movieService.getAllCinemas());
+        return ResponseEntity.ok(searchService.getAllCinemas());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CinemaDTO> getCinemaById(@PathVariable @Min(1) Long id) {
-        return ResponseEntity.ok(movieService.getCinemaById(id));
+        return ResponseEntity.ok(searchService.getCinemaById(id));
     }
 }

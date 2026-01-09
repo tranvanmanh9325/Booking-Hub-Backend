@@ -1,8 +1,12 @@
 package com.example.booking.controller;
 
-import com.example.booking.dto.*;
+import com.example.booking.dto.BookHotelRequest;
+import com.example.booking.dto.HotelBookingDTO;
+import com.example.booking.dto.HotelDTO;
+import com.example.booking.dto.RoomDTO;
 import com.example.booking.model.User;
-import com.example.booking.service.HotelService;
+import com.example.booking.service.BookingService;
+import com.example.booking.service.SearchService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 
@@ -23,32 +27,34 @@ import java.util.List;
 @Validated
 public class HotelController {
 
-    private final HotelService hotelService;
+    private final SearchService searchService;
+    private final BookingService bookingService;
 
-    public HotelController(HotelService hotelService) {
-        this.hotelService = hotelService;
+    public HotelController(SearchService searchService, BookingService bookingService) {
+        this.searchService = searchService;
+        this.bookingService = bookingService;
     }
 
     @GetMapping
     public ResponseEntity<Page<HotelDTO>> getAllHotels(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(hotelService.getAllHotels(page, size));
+        return ResponseEntity.ok(searchService.getAllHotels(page, size));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<HotelDTO> getHotelById(@PathVariable @Min(1) Long id) {
-        return ResponseEntity.ok(hotelService.getHotelById(id));
+        return ResponseEntity.ok(searchService.getHotelById(id));
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<HotelDTO>> searchHotels(@RequestParam String q) {
-        return ResponseEntity.ok(hotelService.searchHotels(q));
+        return ResponseEntity.ok(searchService.searchHotels(q));
     }
 
     @GetMapping("/city/{city}")
     public ResponseEntity<List<HotelDTO>> getHotelsByCity(@PathVariable String city) {
-        return ResponseEntity.ok(hotelService.getHotelsByCity(city));
+        return ResponseEntity.ok(searchService.getHotelsByCity(city));
     }
 
     @GetMapping("/{hotelId}/rooms")
@@ -65,7 +71,7 @@ public class HotelController {
             checkOut = checkIn.plusDays(1);
         }
 
-        return ResponseEntity.ok(hotelService.getRoomsByHotel(hotelId, checkIn, checkOut, guests));
+        return ResponseEntity.ok(searchService.getRoomsByHotel(hotelId, checkIn, checkOut, guests));
     }
 
     @PostMapping("/book")
@@ -76,7 +82,7 @@ public class HotelController {
         if (user == null) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(hotelService.bookHotel(user.getId(), request));
+        return ResponseEntity.ok(bookingService.bookHotel(user.getId(), request));
     }
 
     @GetMapping("/bookings")
@@ -85,7 +91,7 @@ public class HotelController {
         if (user == null) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(hotelService.getUserBookings(user.getId()));
+        return ResponseEntity.ok(bookingService.getUserHotelBookings(user.getId()));
     }
 
     @GetMapping("/bookings/{bookingId}")
@@ -96,7 +102,7 @@ public class HotelController {
         if (user == null) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(hotelService.getBookingById(bookingId, user.getId()));
+        return ResponseEntity.ok(bookingService.getHotelBookingById(bookingId, user.getId()));
     }
 
     @PutMapping("/bookings/{bookingId}/cancel")
@@ -107,6 +113,6 @@ public class HotelController {
         if (user == null) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(hotelService.cancelBooking(bookingId, user.getId()));
+        return ResponseEntity.ok(bookingService.cancelHotelBooking(bookingId, user.getId()));
     }
 }
