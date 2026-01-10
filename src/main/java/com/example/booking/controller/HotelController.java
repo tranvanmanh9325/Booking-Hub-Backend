@@ -1,7 +1,5 @@
 package com.example.booking.controller;
 
-// DTO Imports
-// DTO Imports
 import com.example.booking.dto.BookHotelRequest;
 import com.example.booking.dto.HotelBookingDTO;
 import com.example.booking.dto.HotelDTO;
