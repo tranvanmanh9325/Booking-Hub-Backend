@@ -1,6 +1,9 @@
 package com.example.booking.repository;
 
 import com.example.booking.model.Payment;
+import com.example.booking.enums.BookingType;
+import com.example.booking.enums.PaymentStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,10 +12,10 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-    
+
     Optional<Payment> findByTransactionId(String transactionId);
-    
-    List<Payment> findByBookingIdAndBookingType(Long bookingId, String bookingType);
-    
-    List<Payment> findByStatus(String status);
+
+    List<Payment> findByBookingIdAndBookingType(Long bookingId, BookingType bookingType);
+
+    List<Payment> findByStatus(PaymentStatus status);
 }

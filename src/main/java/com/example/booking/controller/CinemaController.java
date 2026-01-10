@@ -1,5 +1,6 @@
 package com.example.booking.controller;
 
+// DTO Import
 import com.example.booking.dto.CinemaDTO;
 import com.example.booking.service.SearchService;
 

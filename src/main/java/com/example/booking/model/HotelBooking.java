@@ -1,6 +1,7 @@
 package com.example.booking.model;
 
 import jakarta.persistence.*;
+import com.example.booking.enums.BookingStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,8 +38,9 @@ public class HotelBooking {
     @Column(name = "total_price", nullable = false)
     private Double totalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status; // PENDING, CONFIRMED, CANCELLED, COMPLETED
+    private BookingStatus status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -61,7 +63,7 @@ public class HotelBooking {
     }
 
     public HotelBooking(Long id, User user, Hotel hotel, Room room, LocalDate checkIn, LocalDate checkOut,
-            Integer guests, Double totalPrice, String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+            Integer guests, Double totalPrice, BookingStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.user = user;
         this.hotel = hotel;
@@ -139,11 +141,11 @@ public class HotelBooking {
         this.totalPrice = totalPrice;
     }
 
-    public String getStatus() {
+    public BookingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(BookingStatus status) {
         this.status = status;
     }
 
@@ -200,7 +202,7 @@ public class HotelBooking {
                 ", checkOut=" + checkOut +
                 ", guests=" + guests +
                 ", totalPrice=" + totalPrice +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

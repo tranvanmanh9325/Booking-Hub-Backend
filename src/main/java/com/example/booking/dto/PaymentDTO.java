@@ -1,23 +1,26 @@
 package com.example.booking.dto;
 
 import java.time.LocalDateTime;
+import com.example.booking.enums.BookingType;
+import com.example.booking.enums.PaymentMethod;
+import com.example.booking.enums.PaymentStatus;
 
 public class PaymentDTO {
     private Long id;
     private Long bookingId;
-    private String bookingType;
+    private BookingType bookingType;
     private Double amount;
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
     private String transactionId;
-    private String status;
+    private PaymentStatus status;
     private LocalDateTime paidAt;
     private LocalDateTime createdAt;
 
     public PaymentDTO() {
     }
 
-    public PaymentDTO(Long id, Long bookingId, String bookingType, Double amount, String paymentMethod,
-            String transactionId, String status, LocalDateTime paidAt, LocalDateTime createdAt) {
+    public PaymentDTO(Long id, Long bookingId, BookingType bookingType, Double amount, PaymentMethod paymentMethod,
+            String transactionId, PaymentStatus status, LocalDateTime paidAt, LocalDateTime createdAt) {
         this.id = id;
         this.bookingId = bookingId;
         this.bookingType = bookingType;
@@ -45,11 +48,11 @@ public class PaymentDTO {
         this.bookingId = bookingId;
     }
 
-    public String getBookingType() {
+    public BookingType getBookingType() {
         return bookingType;
     }
 
-    public void setBookingType(String bookingType) {
+    public void setBookingType(BookingType bookingType) {
         this.bookingType = bookingType;
     }
 
@@ -61,11 +64,11 @@ public class PaymentDTO {
         this.amount = amount;
     }
 
-    public String getPaymentMethod() {
+    public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 
@@ -77,11 +80,11 @@ public class PaymentDTO {
         this.transactionId = transactionId;
     }
 
-    public String getStatus() {
+    public PaymentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(PaymentStatus status) {
         this.status = status;
     }
 
@@ -130,11 +133,11 @@ public class PaymentDTO {
         return "PaymentDTO{" +
                 "id=" + id +
                 ", bookingId=" + bookingId +
-                ", bookingType='" + bookingType + '\'' +
+                ", bookingType=" + bookingType +
                 ", amount=" + amount +
-                ", paymentMethod='" + paymentMethod + '\'' +
+                ", paymentMethod=" + paymentMethod +
                 ", transactionId='" + transactionId + '\'' +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", paidAt=" + paidAt +
                 ", createdAt=" + createdAt +
                 '}';

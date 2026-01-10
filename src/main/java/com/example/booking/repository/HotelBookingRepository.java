@@ -1,6 +1,8 @@
 package com.example.booking.repository;
 
 import com.example.booking.model.HotelBooking;
+import com.example.booking.enums.BookingStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,5 +38,6 @@ public interface HotelBookingRepository extends JpaRepository<HotelBooking, Long
                      @Param("checkOut") LocalDate checkOut);
 
        @Query("SELECT hb FROM HotelBooking hb WHERE hb.checkIn = :checkIn AND hb.status = :status")
-       List<HotelBooking> findByCheckInAndStatus(@Param("checkIn") LocalDate checkIn, @Param("status") String status);
+       List<HotelBooking> findByCheckInAndStatus(@Param("checkIn") LocalDate checkIn,
+                     @Param("status") BookingStatus status);
 }

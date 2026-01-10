@@ -2,6 +2,8 @@ package com.example.booking.service;
 
 import com.example.booking.dto.*;
 import com.example.booking.exception.ResourceNotFoundException;
+import com.example.booking.mapper.HotelMapper;
+import com.example.booking.mapper.MovieMapper;
 import com.example.booking.model.*;
 import com.example.booking.repository.*;
 import org.slf4j.Logger;
@@ -33,12 +35,14 @@ public class SearchService {
     private final HotelBookingRepository hotelBookingRepository;
     private final BookingSeatRepository bookingSeatRepository;
     private final ReviewService reviewService;
+    private final HotelMapper hotelMapper;
+    private final MovieMapper movieMapper;
 
     public SearchService(HotelRepository hotelRepository, MovieRepository movieRepository,
             RoomRepository roomRepository, CinemaRepository cinemaRepository,
             ShowtimeRepository showtimeRepository, SeatRepository seatRepository,
             HotelBookingRepository hotelBookingRepository, BookingSeatRepository bookingSeatRepository,
-            ReviewService reviewService) {
+            ReviewService reviewService, HotelMapper hotelMapper, MovieMapper movieMapper) {
         this.hotelRepository = hotelRepository;
         this.movieRepository = movieRepository;
         this.roomRepository = roomRepository;
@@ -48,6 +52,8 @@ public class SearchService {
         this.hotelBookingRepository = hotelBookingRepository;
         this.bookingSeatRepository = bookingSeatRepository;
         this.reviewService = reviewService;
+        this.hotelMapper = hotelMapper;
+        this.movieMapper = movieMapper;
     }
 
     // Hotel Search Methods
@@ -61,7 +67,7 @@ public class SearchService {
         List<Long> hotelIds = hotelPage.getContent().stream().map(Hotel::getId).collect(Collectors.toList());
         Map<Long, Double> ratingMap = reviewService.getAverageRatingsByHotelIds(hotelIds);
 
-        return hotelPage.map(hotel -> convertToHotelDTO(hotel, ratingMap.get(hotel.getId())));
+        return hotelPage.map(hotel -> hotelMapper.toHotelDTO(hotel, ratingMap.get(hotel.getId())));
     }
 
     @org.springframework.cache.annotation.Cacheable(value = "hotels", key = "#id")
@@ -73,7 +79,7 @@ public class SearchService {
                     return new ResourceNotFoundException("Hotel not found");
                 });
         Double rating = reviewService.getHotelAverageRating(id);
-        return convertToHotelDTO(hotel, rating);
+        return hotelMapper.toHotelDTO(hotel, rating);
     }
 
     public List<HotelDTO> searchHotels(String query) {
@@ -105,7 +111,7 @@ public class SearchService {
 
         return rooms.stream()
                 .map(room -> {
-                    RoomDTO dto = convertToRoomDTO(room);
+                    RoomDTO dto = hotelMapper.toRoomDTO(room);
                     dto.setIsAvailable(!occupiedRoomIds.contains(room.getId()));
                     return dto;
                 })
@@ -120,7 +126,7 @@ public class SearchService {
         Map<Long, Double> ratingMap = reviewService.getAverageRatingsByHotelIds(hotelIds);
 
         return hotels.stream()
-                .map(hotel -> convertToHotelDTO(hotel, ratingMap.get(hotel.getId())))
+                .map(hotel -> hotelMapper.toHotelDTO(hotel, ratingMap.get(hotel.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -130,7 +136,7 @@ public class SearchService {
     public Page<MovieDTO> getAllMovies(int page, int size) {
         logger.info("Fetching movies page: {}, size: {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
-        return movieRepository.findAll(pageable).map(this::convertToMovieDTO);
+        return movieRepository.findAll(pageable).map(movieMapper::toMovieDTO);
     }
 
     @org.springframework.cache.annotation.Cacheable(value = "movies", key = "#id")
@@ -141,42 +147,42 @@ public class SearchService {
                     logger.error("Movie not found with id: {}", id);
                     return new ResourceNotFoundException("Movie not found");
                 });
-        return convertToMovieDTO(movie);
+        return movieMapper.toMovieDTO(movie);
     }
 
     public List<MovieDTO> searchMovies(String query) {
         return movieRepository.findByTitleContainingIgnoreCase(query).stream()
-                .map(this::convertToMovieDTO)
+                .map(movieMapper::toMovieDTO)
                 .collect(Collectors.toList());
     }
 
     public List<MovieDTO> getMoviesByGenre(String genre) {
         return movieRepository.findByGenre(genre).stream()
-                .map(this::convertToMovieDTO)
+                .map(movieMapper::toMovieDTO)
                 .collect(Collectors.toList());
     }
 
     public List<MovieDTO> getNowShowing() {
         return movieRepository.findNowShowing().stream()
-                .map(this::convertToMovieDTO)
+                .map(movieMapper::toMovieDTO)
                 .collect(Collectors.toList());
     }
 
     public List<CinemaDTO> getAllCinemas() {
         return cinemaRepository.findAll().stream()
-                .map(this::convertToCinemaDTO)
+                .map(movieMapper::toCinemaDTO)
                 .collect(Collectors.toList());
     }
 
     public CinemaDTO getCinemaById(Long id) {
         Cinema cinema = cinemaRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Cinema not found"));
-        return convertToCinemaDTO(cinema);
+        return movieMapper.toCinemaDTO(cinema);
     }
 
     public List<ShowtimeDTO> getShowtimesByMovie(Long movieId) {
         return showtimeRepository.findByMovieId(movieId).stream()
-                .map(this::convertToShowtimeDTO)
+                .map(movieMapper::toShowtimeDTO)
                 .collect(Collectors.toList());
     }
 
@@ -185,91 +191,7 @@ public class SearchService {
         List<Long> bookedSeatIds = bookingSeatRepository.findBookedSeatIdsByShowtimeId(showtimeId);
 
         return seats.stream()
-                .map(seat -> {
-                    SeatDTO dto = convertToSeatDTO(seat);
-                    dto.setIsBooked(bookedSeatIds.contains(seat.getId()));
-                    return dto;
-                })
+                .map(seat -> movieMapper.toSeatDTO(seat, bookedSeatIds.contains(seat.getId())))
                 .collect(Collectors.toList());
-    }
-
-    // Helper conversion methods
-
-    private HotelDTO convertToHotelDTO(Hotel hotel, Double averageRating) {
-        return new HotelDTO(
-                hotel.getId(),
-                hotel.getName(),
-                hotel.getAddress(),
-                hotel.getCity(),
-                hotel.getStarRating(),
-                hotel.getDescription(),
-                hotel.getFacilities(),
-                hotel.getPhoneNumber(),
-                hotel.getEmail(),
-                averageRating);
-    }
-
-    private RoomDTO convertToRoomDTO(Room room) {
-        List<String> imageUrls = room.getImages().stream()
-                .map(RoomImage::getImageUrl)
-                .collect(Collectors.toList());
-
-        return new RoomDTO(
-                room.getId(),
-                room.getHotel().getId(),
-                room.getRoomType(),
-                room.getMaxGuests(),
-                room.getPricePerNight(),
-                room.getAmenities(),
-                room.getRoomNumber(),
-                imageUrls,
-                true);
-    }
-
-    private MovieDTO convertToMovieDTO(Movie movie) {
-        return new MovieDTO(
-                movie.getId(),
-                movie.getTitle(),
-                movie.getDescription(),
-                movie.getGenre(),
-                movie.getDuration(),
-                movie.getRating(),
-                movie.getPosterUrl(),
-                movie.getTrailerUrl(),
-                movie.getReleaseDate());
-    }
-
-    private CinemaDTO convertToCinemaDTO(Cinema cinema) {
-        return new CinemaDTO(
-                cinema.getId(),
-                cinema.getName(),
-                cinema.getAddress(),
-                cinema.getCity(),
-                cinema.getFacilities(),
-                cinema.getPhoneNumber());
-    }
-
-    private ShowtimeDTO convertToShowtimeDTO(Showtime showtime) {
-        return new ShowtimeDTO(
-                showtime.getId(),
-                showtime.getMovie().getId(),
-                showtime.getMovie().getTitle(),
-                showtime.getScreen().getId(),
-                showtime.getScreen().getName(),
-                showtime.getScreen().getCinema().getId(),
-                showtime.getScreen().getCinema().getName(),
-                showtime.getStartTime(),
-                showtime.getEndTime(),
-                showtime.getPrice());
-    }
-
-    private SeatDTO convertToSeatDTO(Seat seat) {
-        return new SeatDTO(
-                seat.getId(),
-                seat.getScreen().getId(),
-                seat.getRow(),
-                seat.getNumber(),
-                seat.getSeatType(),
-                false);
     }
 }

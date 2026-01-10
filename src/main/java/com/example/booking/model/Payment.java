@@ -1,6 +1,9 @@
 package com.example.booking.model;
 
 import jakarta.persistence.*;
+import com.example.booking.enums.BookingType;
+import com.example.booking.enums.PaymentMethod;
+import com.example.booking.enums.PaymentStatus;
 
 import java.time.LocalDateTime;
 
@@ -15,20 +18,23 @@ public class Payment {
     @Column(name = "booking_id", nullable = false)
     private Long bookingId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "booking_type", nullable = false)
-    private String bookingType; // MOVIE, HOTEL, RESTAURANT, PARK
+    private BookingType bookingType;
 
     @Column(name = "amount", nullable = false)
     private Double amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false)
-    private String paymentMethod; // VISA, MASTERCARD, MOMO, ZALOPAY, VNPAY
+    private PaymentMethod paymentMethod;
 
     @Column(name = "transaction_id", unique = true)
     private String transactionId;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status; // PENDING, SUCCESS, FAILED, REFUNDED
+    private PaymentStatus status;
 
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
@@ -56,8 +62,8 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(Long id, Long bookingId, String bookingType, Double amount, String paymentMethod,
-            String transactionId, String status, LocalDateTime paidAt, LocalDateTime createdAt,
+    public Payment(Long id, Long bookingId, BookingType bookingType, Double amount, PaymentMethod paymentMethod,
+            String transactionId, PaymentStatus status, LocalDateTime paidAt, LocalDateTime createdAt,
             LocalDateTime updatedAt) {
         this.id = id;
         this.bookingId = bookingId;
@@ -87,11 +93,11 @@ public class Payment {
         this.bookingId = bookingId;
     }
 
-    public String getBookingType() {
+    public BookingType getBookingType() {
         return bookingType;
     }
 
-    public void setBookingType(String bookingType) {
+    public void setBookingType(BookingType bookingType) {
         this.bookingType = bookingType;
     }
 
@@ -103,11 +109,11 @@ public class Payment {
         this.amount = amount;
     }
 
-    public String getPaymentMethod() {
+    public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 
@@ -119,11 +125,11 @@ public class Payment {
         this.transactionId = transactionId;
     }
 
-    public String getStatus() {
+    public PaymentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(PaymentStatus status) {
         this.status = status;
     }
 
@@ -181,11 +187,11 @@ public class Payment {
         return "Payment{" +
                 "id=" + id +
                 ", bookingId=" + bookingId +
-                ", bookingType='" + bookingType + '\'' +
+                ", bookingType=" + bookingType +
                 ", amount=" + amount +
-                ", paymentMethod='" + paymentMethod + '\'' +
+                ", paymentMethod=" + paymentMethod +
                 ", transactionId='" + transactionId + '\'' +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", paidAt=" + paidAt +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

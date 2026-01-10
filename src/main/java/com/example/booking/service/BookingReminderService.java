@@ -4,6 +4,8 @@ import com.example.booking.model.HotelBooking;
 import com.example.booking.model.MovieBooking;
 import com.example.booking.repository.HotelBookingRepository;
 import com.example.booking.repository.MovieBookingRepository;
+import com.example.booking.enums.BookingStatus;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -42,7 +44,8 @@ public class BookingReminderService {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
 
         // 1. Hotel Reminders
-        List<HotelBooking> hotelBookings = hotelBookingRepository.findByCheckInAndStatus(tomorrow, "CONFIRMED");
+        List<HotelBooking> hotelBookings = hotelBookingRepository.findByCheckInAndStatus(tomorrow,
+                BookingStatus.CONFIRMED);
         logger.info("Found {} hotel bookings for tomorrow ({})", hotelBookings.size(), tomorrow);
 
         for (HotelBooking booking : hotelBookings) {
@@ -59,7 +62,7 @@ public class BookingReminderService {
         LocalDateTime endOfDay = tomorrow.atTime(LocalTime.MAX);
 
         List<MovieBooking> movieBookings = movieBookingRepository.findByShowtimeStartTimeBetweenAndStatus(startOfDay,
-                endOfDay, "CONFIRMED");
+                endOfDay, BookingStatus.CONFIRMED);
         logger.info("Found {} movie bookings for tomorrow ({})", movieBookings.size(), tomorrow);
 
         for (MovieBooking booking : movieBookings) {

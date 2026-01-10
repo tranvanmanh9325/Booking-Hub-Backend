@@ -2,7 +2,10 @@ package com.example.booking.service;
 
 import com.example.booking.dto.*;
 import com.example.booking.exception.*;
+import com.example.booking.mapper.BookingMapper;
 import com.example.booking.model.*;
+import com.example.booking.enums.BookingStatus;
+
 import com.example.booking.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +33,12 @@ public class BookingService {
     private final BookingSeatRepository bookingSeatRepository;
     private final SeatRepository seatRepository;
     private final EmailService emailService;
+    private final BookingMapper bookingMapper;
 
     public BookingService(HotelBookingRepository hotelBookingRepository, MovieBookingRepository movieBookingRepository,
             UserRepository userRepository, HotelRepository hotelRepository, RoomRepository roomRepository,
             ShowtimeRepository showtimeRepository, BookingSeatRepository bookingSeatRepository,
-            SeatRepository seatRepository, EmailService emailService) {
+            SeatRepository seatRepository, EmailService emailService, BookingMapper bookingMapper) {
         this.hotelBookingRepository = hotelBookingRepository;
         this.movieBookingRepository = movieBookingRepository;
         this.userRepository = userRepository;
@@ -44,6 +48,7 @@ public class BookingService {
         this.bookingSeatRepository = bookingSeatRepository;
         this.seatRepository = seatRepository;
         this.emailService = emailService;
+        this.bookingMapper = bookingMapper;
     }
 
     // Hotel Booking Methods
@@ -85,7 +90,7 @@ public class BookingService {
         booking.setCheckOut(request.getCheckOut());
         booking.setGuests(request.getGuests());
         booking.setTotalPrice(totalPrice);
-        booking.setStatus("PENDING");
+        booking.setStatus(BookingStatus.PENDING);
 
         booking = hotelBookingRepository.save(booking);
 
@@ -95,13 +100,13 @@ public class BookingService {
             logger.error("Failed to send hotel booking confirmation", e);
         }
 
-        return convertToHotelBookingDTO(booking);
+        return bookingMapper.toHotelBookingDTO(booking);
     }
 
     @Transactional(readOnly = true)
     public List<HotelBookingDTO> getUserHotelBookings(Long userId) {
         return hotelBookingRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(this::convertToHotelBookingDTO)
+                .map(bookingMapper::toHotelBookingDTO)
                 .collect(Collectors.toList());
     }
 
@@ -114,7 +119,7 @@ public class BookingService {
             throw new ForbiddenException("Unauthorized access to booking");
         }
 
-        return convertToHotelBookingDTO(booking);
+        return bookingMapper.toHotelBookingDTO(booking);
     }
 
     public HotelBookingDTO cancelHotelBooking(Long bookingId, Long userId) {
@@ -125,11 +130,11 @@ public class BookingService {
             throw new ForbiddenException("Unauthorized access to booking");
         }
 
-        if (!booking.getStatus().equals("PENDING") && !booking.getStatus().equals("CONFIRMED")) {
+        if (booking.getStatus() != BookingStatus.PENDING && booking.getStatus() != BookingStatus.CONFIRMED) {
             throw new BadRequestException("Cannot cancel booking with status: " + booking.getStatus());
         }
 
-        booking.setStatus("CANCELLED");
+        booking.setStatus(BookingStatus.CANCELLED);
         booking = hotelBookingRepository.save(booking);
 
         try {
@@ -139,7 +144,7 @@ public class BookingService {
             logger.error("Failed to send hotel cancellation email", e);
         }
 
-        return convertToHotelBookingDTO(booking);
+        return bookingMapper.toHotelBookingDTO(booking);
     }
 
     // Movie Booking Methods
@@ -163,7 +168,7 @@ public class BookingService {
         booking.setUser(user);
         booking.setShowtime(showtime);
         booking.setBookingDate(LocalDateTime.now());
-        booking.setStatus("PENDING");
+        booking.setStatus(BookingStatus.PENDING);
 
         double totalPrice = showtime.getPrice() * request.getSeatIds().size();
         booking.setTotalPrice(totalPrice);
@@ -187,13 +192,16 @@ public class BookingService {
             bookingSeatRepository.save(bookingSeat);
         }
 
-        return convertToMovieBookingDTO(booking);
+        // Refresh booking to get seats
+        booking = movieBookingRepository.findById(booking.getId()).orElse(booking);
+
+        return bookingMapper.toMovieBookingDTO(booking);
     }
 
     @Transactional(readOnly = true)
     public List<MovieBookingDTO> getUserMovieBookings(Long userId) {
         return movieBookingRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(this::convertToMovieBookingDTO)
+                .map(bookingMapper::toMovieBookingDTO)
                 .collect(Collectors.toList());
     }
 
@@ -206,7 +214,7 @@ public class BookingService {
             throw new ForbiddenException("Unauthorized access to booking");
         }
 
-        return convertToMovieBookingDTO(booking);
+        return bookingMapper.toMovieBookingDTO(booking);
     }
 
     public MovieBookingDTO cancelMovieBooking(Long bookingId, Long userId) {
@@ -217,11 +225,11 @@ public class BookingService {
             throw new ForbiddenException("Unauthorized access to booking");
         }
 
-        if (!booking.getStatus().equals("PENDING") && !booking.getStatus().equals("CONFIRMED")) {
+        if (booking.getStatus() != BookingStatus.PENDING && booking.getStatus() != BookingStatus.CONFIRMED) {
             throw new BadRequestException("Cannot cancel booking with status: " + booking.getStatus());
         }
 
-        booking.setStatus("CANCELLED");
+        booking.setStatus(BookingStatus.CANCELLED);
         booking = movieBookingRepository.save(booking);
 
         try {
@@ -231,53 +239,6 @@ public class BookingService {
             logger.error("Failed to send movie cancellation email", e);
         }
 
-        return convertToMovieBookingDTO(booking);
-    }
-
-    // Helper conversion methods
-
-    private HotelBookingDTO convertToHotelBookingDTO(HotelBooking booking) {
-        return new HotelBookingDTO(
-                booking.getId(),
-                booking.getUser().getId(),
-                booking.getHotel().getId(),
-                booking.getHotel().getName(),
-                booking.getRoom().getId(),
-                booking.getRoom().getRoomType(),
-                booking.getCheckIn(),
-                booking.getCheckOut(),
-                booking.getGuests(),
-                booking.getTotalPrice(),
-                booking.getStatus(),
-                booking.getCreatedAt());
-    }
-
-    private MovieBookingDTO convertToMovieBookingDTO(MovieBooking booking) {
-        List<SeatDTO> seatDTOs = booking.getBookingSeats().stream()
-                .map(bs -> convertToSeatDTO(bs.getSeat()))
-                .collect(Collectors.toList());
-
-        return new MovieBookingDTO(
-                booking.getId(),
-                booking.getUser().getId(),
-                booking.getShowtime().getId(),
-                booking.getShowtime().getMovie().getTitle(),
-                booking.getShowtime().getScreen().getCinema().getName(),
-                booking.getShowtime().getScreen().getName(),
-                booking.getShowtime().getStartTime(),
-                booking.getBookingDate(),
-                booking.getStatus(),
-                booking.getTotalPrice(),
-                seatDTOs);
-    }
-
-    private SeatDTO convertToSeatDTO(Seat seat) {
-        return new SeatDTO(
-                seat.getId(),
-                seat.getScreen().getId(),
-                seat.getRow(),
-                seat.getNumber(),
-                seat.getSeatType(),
-                false);
+        return bookingMapper.toMovieBookingDTO(booking);
     }
 }

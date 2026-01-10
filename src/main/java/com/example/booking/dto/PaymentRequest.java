@@ -1,28 +1,29 @@
 package com.example.booking.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import com.example.booking.enums.BookingType;
+import com.example.booking.enums.PaymentMethod;
 
 public class PaymentRequest {
 
     @NotNull(message = "Booking ID is required")
     private Long bookingId;
 
-    @NotBlank(message = "Booking type is required")
-    private String bookingType; // MOVIE, HOTEL, RESTAURANT, PARK
+    @NotNull(message = "Booking type is required")
+    private BookingType bookingType;
 
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")
     private Double amount;
 
-    @NotBlank(message = "Payment method is required")
-    private String paymentMethod; // VISA, MASTERCARD, MOMO, ZALOPAY, VNPAY
+    @NotNull(message = "Payment method is required")
+    private PaymentMethod paymentMethod;
 
     public PaymentRequest() {
     }
 
-    public PaymentRequest(Long bookingId, String bookingType, Double amount, String paymentMethod) {
+    public PaymentRequest(Long bookingId, BookingType bookingType, Double amount, PaymentMethod paymentMethod) {
         this.bookingId = bookingId;
         this.bookingType = bookingType;
         this.amount = amount;
@@ -37,11 +38,11 @@ public class PaymentRequest {
         this.bookingId = bookingId;
     }
 
-    public String getBookingType() {
+    public BookingType getBookingType() {
         return bookingType;
     }
 
-    public void setBookingType(String bookingType) {
+    public void setBookingType(BookingType bookingType) {
         this.bookingType = bookingType;
     }
 
@@ -53,11 +54,11 @@ public class PaymentRequest {
         this.amount = amount;
     }
 
-    public String getPaymentMethod() {
+    public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 
@@ -83,9 +84,9 @@ public class PaymentRequest {
     public String toString() {
         return "PaymentRequest{" +
                 "bookingId=" + bookingId +
-                ", bookingType='" + bookingType + '\'' +
+                ", bookingType=" + bookingType +
                 ", amount=" + amount +
-                ", paymentMethod='" + paymentMethod + '\'' +
+                ", paymentMethod=" + paymentMethod +
                 '}';
     }
 }

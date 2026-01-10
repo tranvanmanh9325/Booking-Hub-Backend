@@ -2,6 +2,7 @@ package com.example.booking.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.example.booking.enums.BookingStatus;
 
 public class MovieBookingDTO {
     private Long id;
@@ -12,7 +13,7 @@ public class MovieBookingDTO {
     private String screenName;
     private LocalDateTime showtimeStart;
     private LocalDateTime bookingDate;
-    private String status;
+    private BookingStatus status;
     private Double totalPrice;
     private List<SeatDTO> seats;
 
@@ -20,7 +21,8 @@ public class MovieBookingDTO {
     }
 
     public MovieBookingDTO(Long id, Long userId, Long showtimeId, String movieTitle, String cinemaName,
-            String screenName, LocalDateTime showtimeStart, LocalDateTime bookingDate, String status, Double totalPrice,
+            String screenName, LocalDateTime showtimeStart, LocalDateTime bookingDate, BookingStatus status,
+            Double totalPrice,
             List<SeatDTO> seats) {
         this.id = id;
         this.userId = userId;
@@ -99,11 +101,11 @@ public class MovieBookingDTO {
         this.bookingDate = bookingDate;
     }
 
-    public String getStatus() {
+    public BookingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(BookingStatus status) {
         this.status = status;
     }
 
@@ -160,7 +162,7 @@ public class MovieBookingDTO {
                 ", screenName='" + screenName + '\'' +
                 ", showtimeStart=" + showtimeStart +
                 ", bookingDate=" + bookingDate +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", totalPrice=" + totalPrice +
                 ", seats=" + seats +
                 '}';

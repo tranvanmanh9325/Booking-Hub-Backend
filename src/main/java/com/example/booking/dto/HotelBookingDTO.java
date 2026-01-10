@@ -2,6 +2,7 @@ package com.example.booking.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.example.booking.enums.BookingStatus;
 
 public class HotelBookingDTO {
     private Long id;
@@ -14,14 +15,14 @@ public class HotelBookingDTO {
     private LocalDate checkOut;
     private Integer guests;
     private Double totalPrice;
-    private String status;
+    private BookingStatus status;
     private LocalDateTime createdAt;
 
     public HotelBookingDTO() {
     }
 
     public HotelBookingDTO(Long id, Long userId, Long hotelId, String hotelName, Long roomId, String roomType,
-            LocalDate checkIn, LocalDate checkOut, Integer guests, Double totalPrice, String status,
+            LocalDate checkIn, LocalDate checkOut, Integer guests, Double totalPrice, BookingStatus status,
             LocalDateTime createdAt) {
         this.id = id;
         this.userId = userId;
@@ -117,11 +118,11 @@ public class HotelBookingDTO {
         this.totalPrice = totalPrice;
     }
 
-    public String getStatus() {
+    public BookingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(BookingStatus status) {
         this.status = status;
     }
 
@@ -173,7 +174,7 @@ public class HotelBookingDTO {
                 ", checkOut=" + checkOut +
                 ", guests=" + guests +
                 ", totalPrice=" + totalPrice +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", createdAt=" + createdAt +
                 '}';
     }

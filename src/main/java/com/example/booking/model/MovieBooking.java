@@ -1,14 +1,11 @@
 package com.example.booking.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import com.example.booking.enums.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Setter
-@Getter
 @Entity
 @Table(name = "movie_bookings")
 public class MovieBooking {
@@ -28,8 +25,9 @@ public class MovieBooking {
     @Column(name = "booking_date", nullable = false)
     private LocalDateTime bookingDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status; // PENDING, CONFIRMED, CANCELLED, COMPLETED
+    private BookingStatus status;
 
     @Column(name = "total_price", nullable = false)
     private Double totalPrice;
@@ -60,7 +58,7 @@ public class MovieBooking {
     public MovieBooking() {
     }
 
-    public MovieBooking(Long id, User user, Showtime showtime, LocalDateTime bookingDate, String status,
+    public MovieBooking(Long id, User user, Showtime showtime, LocalDateTime bookingDate, BookingStatus status,
             Double totalPrice, LocalDateTime createdAt, LocalDateTime updatedAt, List<BookingSeat> bookingSeats) {
         this.id = id;
         this.user = user;
@@ -70,6 +68,78 @@ public class MovieBooking {
         this.totalPrice = totalPrice;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.bookingSeats = bookingSeats;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Showtime getShowtime() {
+        return showtime;
+    }
+
+    public void setShowtime(Showtime showtime) {
+        this.showtime = showtime;
+    }
+
+    public LocalDateTime getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(LocalDateTime bookingDate) {
+        this.bookingDate = bookingDate;
+    }
+
+    public BookingStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(BookingStatus status) {
+        this.status = status;
+    }
+
+    public Double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public List<BookingSeat> getBookingSeats() {
+        return bookingSeats;
+    }
+
+    public void setBookingSeats(List<BookingSeat> bookingSeats) {
         this.bookingSeats = bookingSeats;
     }
 
@@ -104,7 +174,7 @@ public class MovieBooking {
                 ", user=" + user +
                 ", showtime=" + showtime +
                 ", bookingDate=" + bookingDate +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", totalPrice=" + totalPrice +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

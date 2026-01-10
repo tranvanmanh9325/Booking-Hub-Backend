@@ -1,8 +1,11 @@
 package com.example.booking.controller;
 
+// DTO Imports
 import com.example.booking.dto.PaymentDTO;
 import com.example.booking.dto.PaymentRequest;
 import com.example.booking.service.PaymentService;
+import com.example.booking.enums.BookingType;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.validation.annotation.Validated;
@@ -42,7 +45,7 @@ public class PaymentController {
     @GetMapping("/booking/{bookingId}")
     public ResponseEntity<List<PaymentDTO>> getPaymentsByBooking(
             @PathVariable @Min(1) Long bookingId,
-            @RequestParam String bookingType) {
+            @RequestParam BookingType bookingType) {
         return ResponseEntity.ok(paymentService.getPaymentsByBooking(bookingId, bookingType));
     }
 

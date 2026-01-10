@@ -5,6 +5,7 @@ import com.example.booking.dto.AuthResponse;
 import com.example.booking.dto.RefreshTokenRequest;
 import com.example.booking.dto.GoogleAuthRequest;
 import com.example.booking.dto.RegisterRequest;
+import com.example.booking.mapper.UserMapper;
 import com.example.booking.model.User;
 import com.example.booking.repository.UserRepository;
 import com.example.booking.util.JwtUtil;
@@ -33,14 +34,16 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final EmailService emailService;
+    private final UserMapper userMapper;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
-            RefreshTokenService refreshTokenService, EmailService emailService) {
+            RefreshTokenService refreshTokenService, EmailService emailService, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
         this.emailService = emailService;
+        this.userMapper = userMapper;
     }
 
     @Transactional
@@ -56,11 +59,8 @@ public class AuthService {
             throw new ConflictException("Phone number already exists");
         }
 
-        User user = new User();
-        user.setEmail(request.getEmail());
+        User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFullName(request.getFullName());
-        user.setPhone(request.getPhone());
 
         user = userRepository.save(user);
 
@@ -75,8 +75,7 @@ public class AuthService {
         String token = jwtUtil.generateToken(user.getEmail());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        return new AuthResponse(token, refreshToken.getToken(), "Bearer", user.getId(), user.getEmail(),
-                user.getFullName());
+        return userMapper.toAuthResponse(user, token, refreshToken.getToken(), "Bearer");
     }
 
     @Transactional
@@ -93,8 +92,7 @@ public class AuthService {
         String token = jwtUtil.generateToken(user.getEmail());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        return new AuthResponse(token, refreshToken.getToken(), "Bearer", user.getId(), user.getEmail(),
-                user.getFullName());
+        return userMapper.toAuthResponse(user, token, refreshToken.getToken(), "Bearer");
     }
 
     @Transactional
@@ -139,8 +137,7 @@ public class AuthService {
         String token = jwtUtil.generateToken(user.getEmail());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        return new AuthResponse(token, refreshToken.getToken(), "Bearer", user.getId(), user.getEmail(),
-                user.getFullName());
+        return userMapper.toAuthResponse(user, token, refreshToken.getToken(), "Bearer");
     }
 
     @Transactional
@@ -152,8 +149,7 @@ public class AuthService {
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     String token = jwtUtil.generateToken(user.getEmail());
-                    return new AuthResponse(token, requestRefreshToken, "Bearer", user.getId(), user.getEmail(),
-                            user.getFullName());
+                    return userMapper.toAuthResponse(user, token, requestRefreshToken, "Bearer");
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                         "Refresh token is not in database!"));
