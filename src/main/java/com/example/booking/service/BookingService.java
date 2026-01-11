@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@SuppressWarnings("null")
 public class BookingService {
 
     private static final Logger logger = LoggerFactory.getLogger(BookingService.class);

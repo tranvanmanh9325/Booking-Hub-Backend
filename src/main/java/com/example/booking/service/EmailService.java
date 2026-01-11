@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@SuppressWarnings("null")
 public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);

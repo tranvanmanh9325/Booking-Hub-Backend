@@ -6,6 +6,7 @@ import org.springframework.beans.BeanWrapperImpl;
 
 import java.time.LocalDate;
 
+@SuppressWarnings("null")
 public class DateRangeValidator implements ConstraintValidator<DateRange, Object> {
 
     private String startField;

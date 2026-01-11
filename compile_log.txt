@@ -1,0 +1,59 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< com.example:booking >-------------------------
+[INFO] Building booking 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.5.0:clean (default-clean) @ booking ---
+[INFO] Deleting D:\GitHub\Booking Hub\Booking-Hub-Backend\target
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (default) @ booking ---
+[INFO] argLine set to "-javaagent:C:\\Users\\manht\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=D:\\GitHub\\Booking Hub\\Booking-Hub-Backend\\target\\jacoco.exec"
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ booking ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 8 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ booking ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 98 source files with javac [debug parameters release 25] to target\classes
+[WARNING] --add-opens has no effect at compile time
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ booking ---
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ booking ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 5 source files with javac [debug parameters release 25] to target\test-classes
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] --add-opens has no effect at compile time
+[INFO] 1 warning
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/GitHub/Booking Hub/Booking-Hub-Backend/src/test/java/com/example/booking/integration/BookingIntegrationTest.java:[12,63] package org.springframework.boot.test.autoconfigure.web.servlet does not exist
+[ERROR] /D:/GitHub/Booking Hub/Booking-Hub-Backend/src/test/java/com/example/booking/integration/BookingIntegrationTest.java:[29,2] cannot find symbol
+  symbol: class AutoConfigureMockMvc
+[INFO] 2 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.026 s
+[INFO] Finished at: 2026-01-11T14:48:48+07:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:testCompile (default-testCompile) on project booking: Compilation failure: Compilation failure: 
+[ERROR] /D:/GitHub/Booking Hub/Booking-Hub-Backend/src/test/java/com/example/booking/integration/BookingIntegrationTest.java:[12,63] package org.springframework.boot.test.autoconfigure.web.servlet does not exist
+[ERROR] /D:/GitHub/Booking Hub/Booking-Hub-Backend/src/test/java/com/example/booking/integration/BookingIntegrationTest.java:[29,2] cannot find symbol
+[ERROR]   symbol: class AutoConfigureMockMvc
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

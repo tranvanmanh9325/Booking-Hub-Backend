@@ -48,15 +48,11 @@ public class AuthController {
 
     @PostMapping("/google")
     public ResponseEntity<AuthResponse> googleAuth(@RequestBody GoogleAuthRequest request) {
-        try {
-            AuthResponse response = authService.googleAuth(request);
-            ResponseCookie cookie = createRefreshTokenCookie(response.getRefreshToken());
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        AuthResponse response = authService.googleAuth(request);
+        ResponseCookie cookie = createRefreshTokenCookie(response.getRefreshToken());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(response);
     }
 
     @PostMapping("/refresh")

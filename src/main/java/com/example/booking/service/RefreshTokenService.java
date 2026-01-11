@@ -14,6 +14,7 @@ import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
+@SuppressWarnings("null")
 public class RefreshTokenService {
     @Value("${jwt.refreshExpirationMs}")
     private Long refreshTokenDurationMs;
@@ -32,14 +33,15 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshToken createRefreshToken(Long userId) {
-        RefreshToken refreshToken = new RefreshToken();
+        com.example.booking.model.User user = userRepository.findById(userId).get();
+        RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
+                .orElse(new RefreshToken());
 
-        refreshToken.setUser(userRepository.findById(userId).get());
+        refreshToken.setUser(user);
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         refreshToken.setToken(UUID.randomUUID().toString());
 
-        refreshToken = refreshTokenRepository.save(refreshToken);
-        return refreshToken;
+        return refreshTokenRepository.save(refreshToken);
     }
 
     @Transactional
