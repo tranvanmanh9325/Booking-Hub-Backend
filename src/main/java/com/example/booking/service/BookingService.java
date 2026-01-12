@@ -18,6 +18,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service xử lý các nghiệp vụ đặt chỗ (Booking).
+ * Bao gồm đặt phòng khách sạn và đặt vé xem phim.
+ */
 @Service
 @Transactional
 @SuppressWarnings("null")
@@ -54,6 +58,14 @@ public class BookingService {
 
     // Hotel Booking Methods
 
+    /**
+     * Tạo booking khách sạn mới.
+     * Kiểm tra tính khả dụng của phòng, tính tổng tiền và lưu booking.
+     * 
+     * @param userId  ID người đặt
+     * @param request Thông tin đặt phòng
+     * @return HotelBookingDTO thông tin booking đã tạo
+     */
     public HotelBookingDTO bookHotel(Long userId, BookHotelRequest request) {
         logger.info("Processing hotel booking for userId: {}", userId);
         User user = userRepository.findById(java.util.Objects.requireNonNull(userId))
@@ -150,6 +162,14 @@ public class BookingService {
 
     // Movie Booking Methods
 
+    /**
+     * Tạo booking vé xem phim mới.
+     * Kiểm tra ghế trống, tính tiền và lưu booking.
+     * 
+     * @param userId  ID người đặt
+     * @param request Thông tin đặt vé
+     * @return MovieBookingDTO thông tin booking đã tạo
+     */
     public MovieBookingDTO bookMovie(Long userId, BookMovieRequest request) {
         logger.info("Processing movie booking for userId: {}, showtimeId: {}", userId, request.getShowtimeId());
         User user = userRepository.findById(java.util.Objects.requireNonNull(userId))

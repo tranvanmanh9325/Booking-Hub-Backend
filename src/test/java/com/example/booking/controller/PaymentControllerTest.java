@@ -6,6 +6,11 @@ import com.example.booking.enums.BookingType;
 import com.example.booking.enums.PaymentMethod;
 import com.example.booking.enums.PaymentStatus;
 import com.example.booking.service.PaymentService;
+import com.example.booking.util.JwtUtil;
+import com.example.booking.security.RateLimitFilter;
+import com.example.booking.filter.MdcLoggingFilter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import com.example.booking.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +38,21 @@ class PaymentControllerTest {
 
     @MockitoBean
     private PaymentService paymentService;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
+
+    @MockitoBean
+    private RateLimitFilter rateLimitFilter;
+
+    @MockitoBean
+    private MdcLoggingFilter mdcLoggingFilter;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Autowired
     private ObjectMapper objectMapper;

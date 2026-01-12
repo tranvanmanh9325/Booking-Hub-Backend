@@ -24,6 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Service xử lý logic xác thực và ủy quyền.
+ * Quản lý user registration, login, token management.
+ */
 @Service
 public class AuthService {
 
@@ -46,6 +50,13 @@ public class AuthService {
         this.userMapper = userMapper;
     }
 
+    /**
+     * Đăng ký người dùng mới.
+     * Kiểm tra email/sđt tồn tại, mã hóa mật khẩu, tạo user và generate token.
+     * 
+     * @param request DTO chứa thông tin đăng ký
+     * @return AuthResponse chứa token và thông tin user
+     */
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         logger.info("Registering user with email: {}", request.getEmail());
@@ -78,6 +89,13 @@ public class AuthService {
         return userMapper.toAuthResponse(user, token, refreshToken.getToken(), "Bearer");
     }
 
+    /**
+     * Đăng nhập người dùng.
+     * Xác thực credential và tạo token mới.
+     * 
+     * @param request DTO chứa email và password
+     * @return AuthResponse chứa token và thông tin user
+     */
     @Transactional
     public AuthResponse login(AuthRequest request) {
         logger.info("Authenticating user with email: {}", request.getEmail());
@@ -95,6 +113,13 @@ public class AuthService {
         return userMapper.toAuthResponse(user, token, refreshToken.getToken(), "Bearer");
     }
 
+    /**
+     * Xác thực thông qua Google OAuth.
+     * Tạo user mới nếu chưa tồn tại, hoặc cập nhật thông tin nếu đã có.
+     * 
+     * @param request DTO chứa thông tin từ Google
+     * @return AuthResponse chứa token và thông tin user
+     */
     @Transactional
     public AuthResponse googleAuth(GoogleAuthRequest request) {
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
@@ -140,6 +165,12 @@ public class AuthService {
         return userMapper.toAuthResponse(user, token, refreshToken.getToken(), "Bearer");
     }
 
+    /**
+     * Làm mới Access Token bằng Refresh Token.
+     * 
+     * @param request DTO chứa refresh token
+     * @return AuthResponse chứa token mới
+     */
     @Transactional
     public AuthResponse refreshToken(RefreshTokenRequest request) {
         String requestRefreshToken = request.getRefreshToken();
@@ -155,6 +186,12 @@ public class AuthService {
                         "Refresh token is not in database!"));
     }
 
+    /**
+     * Xử lý yêu cầu quên mật khẩu.
+     * Tạo token reset và gửi email hướng dẫn.
+     * 
+     * @param email Email của người dùng
+     */
     @Transactional
     public void forgotPassword(String email) {
         User user = userRepository.findByEmail(email)
@@ -171,6 +208,12 @@ public class AuthService {
         emailService.sendPasswordResetEmail(user.getEmail(), resetUrl);
     }
 
+    /**
+     * Đặt lại mật khẩu mới sử dụng token reset.
+     * 
+     * @param token       Token xác thực đặt lại mật khẩu
+     * @param newPassword Mật khẩu mới
+     */
     @Transactional
     public void resetPassword(String token, String newPassword) {
         User user = userRepository.findByResetPasswordToken(token)
