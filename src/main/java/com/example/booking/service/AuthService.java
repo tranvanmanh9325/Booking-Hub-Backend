@@ -72,6 +72,7 @@ public class AuthService {
 
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole("USER");
 
         user = userRepository.save(user);
 
@@ -135,6 +136,7 @@ public class AuthService {
             user.setEmail(request.getEmail());
             user.setFullName(request.getName() != null ? request.getName() : request.getEmail());
             user.setAvatarUrl(request.getPicture());
+            user.setRole("USER");
             // Generate a random password for Google users (they won't use it)
             user.setPassword(passwordEncoder.encode("GOOGLE_OAUTH_" + System.currentTimeMillis()));
 

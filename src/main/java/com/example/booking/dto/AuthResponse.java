@@ -7,17 +7,24 @@ public class AuthResponse {
     private Long userId;
     private String email;
     private String fullName;
+    private String phone;
+    private String role;
+    private String avatarUrl;
 
     public AuthResponse() {
     }
 
-    public AuthResponse(String token, String refreshToken, String type, Long userId, String email, String fullName) {
+    public AuthResponse(String token, String refreshToken, String type, Long userId, String email, String fullName,
+            String phone, String role, String avatarUrl) {
         this.token = token;
         this.refreshToken = refreshToken;
         this.type = type;
         this.userId = userId;
         this.email = email;
         this.fullName = fullName;
+        this.phone = phone;
+        this.role = role;
+        this.avatarUrl = avatarUrl;
     }
 
     public String getToken() {
@@ -68,6 +75,30 @@ public class AuthResponse {
         this.fullName = fullName;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -79,12 +110,13 @@ public class AuthResponse {
                 java.util.Objects.equals(type, that.type) &&
                 java.util.Objects.equals(userId, that.userId) &&
                 java.util.Objects.equals(email, that.email) &&
-                java.util.Objects.equals(fullName, that.fullName);
+                java.util.Objects.equals(fullName, that.fullName) &&
+                java.util.Objects.equals(phone, that.phone);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(token, type, userId, email, fullName);
+        return java.util.Objects.hash(token, type, userId, email, fullName, phone);
     }
 
     @Override
@@ -95,6 +127,9 @@ public class AuthResponse {
                 ", userId=" + userId +
                 ", email='" + email + '\'' +
                 ", fullName='" + fullName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", role='" + role + '\'' +
+                ", avatarUrl='" + avatarUrl + '\'' +
                 '}';
     }
 }

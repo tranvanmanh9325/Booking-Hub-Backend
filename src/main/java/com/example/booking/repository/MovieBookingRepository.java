@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface MovieBookingRepository extends JpaRepository<MovieBooking, Long> {
 
+        void deleteByUser(com.example.booking.model.User user);
+
         List<MovieBooking> findByUserId(Long userId);
 
         @org.springframework.data.jpa.repository.Query("SELECT mb FROM MovieBooking mb JOIN FETCH mb.showtime s JOIN FETCH s.movie JOIN FETCH s.screen sc JOIN FETCH sc.cinema WHERE mb.user.id = :userId ORDER BY mb.createdAt DESC")

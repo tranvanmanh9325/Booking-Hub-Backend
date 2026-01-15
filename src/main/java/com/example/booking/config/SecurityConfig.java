@@ -89,6 +89,7 @@ public class SecurityConfig {
                                                                 "/api/v1/hotels/bookings/**")
                                                 .authenticated()
                                                 .requestMatchers("/api/v1/payments/**").authenticated()
+                                                .requestMatchers("/api/v1/content/**").permitAll()
                                                 .anyRequest().authenticated());
                 return http.build();
         }

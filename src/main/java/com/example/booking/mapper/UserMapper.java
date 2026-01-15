@@ -16,13 +16,17 @@ public interface UserMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "resetPasswordToken", ignore = true)
     @Mapping(target = "resetPasswordTokenExpiry", ignore = true)
+    @Mapping(target = "role", ignore = true)
     User toUser(RegisterRequest request);
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "email", source = "user.email")
     @Mapping(target = "fullName", source = "user.fullName")
+    @Mapping(target = "phone", source = "user.phone")
     @Mapping(target = "token", source = "token")
     @Mapping(target = "refreshToken", source = "refreshToken")
     @Mapping(target = "type", source = "type")
+    @Mapping(target = "role", source = "user.role")
+    @Mapping(target = "avatarUrl", source = "user.avatarUrl")
     AuthResponse toAuthResponse(User user, String token, String refreshToken, String type);
 }

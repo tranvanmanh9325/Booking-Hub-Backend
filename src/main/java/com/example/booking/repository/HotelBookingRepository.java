@@ -14,6 +14,8 @@ import java.util.List;
 @Repository
 public interface HotelBookingRepository extends JpaRepository<HotelBooking, Long> {
 
+       void deleteByUser(com.example.booking.model.User user);
+
        List<HotelBooking> findByUserId(Long userId);
 
        @Query("SELECT hb FROM HotelBooking hb LEFT JOIN FETCH hb.hotel LEFT JOIN FETCH hb.room WHERE hb.user.id = :userId ORDER BY hb.createdAt DESC")

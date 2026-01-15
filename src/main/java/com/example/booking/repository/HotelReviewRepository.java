@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface HotelReviewRepository extends JpaRepository<HotelReview, Long> {
 
+    void deleteByUser(com.example.booking.model.User user);
+
     List<HotelReview> findByHotelId(Long hotelId);
 
     Optional<HotelReview> findByHotelIdAndUserId(Long hotelId, Long userId);
