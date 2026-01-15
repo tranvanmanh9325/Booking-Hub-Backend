@@ -3,7 +3,11 @@ package com.example.booking.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.example.booking.enums.BookingStatus;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class MovieBookingDTO {
     private Long id;
     private Long userId;
@@ -34,94 +38,6 @@ public class MovieBookingDTO {
         this.bookingDate = bookingDate;
         this.status = status;
         this.totalPrice = totalPrice;
-        this.seats = seats;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getShowtimeId() {
-        return showtimeId;
-    }
-
-    public void setShowtimeId(Long showtimeId) {
-        this.showtimeId = showtimeId;
-    }
-
-    public String getMovieTitle() {
-        return movieTitle;
-    }
-
-    public void setMovieTitle(String movieTitle) {
-        this.movieTitle = movieTitle;
-    }
-
-    public String getCinemaName() {
-        return cinemaName;
-    }
-
-    public void setCinemaName(String cinemaName) {
-        this.cinemaName = cinemaName;
-    }
-
-    public String getScreenName() {
-        return screenName;
-    }
-
-    public void setScreenName(String screenName) {
-        this.screenName = screenName;
-    }
-
-    public LocalDateTime getShowtimeStart() {
-        return showtimeStart;
-    }
-
-    public void setShowtimeStart(LocalDateTime showtimeStart) {
-        this.showtimeStart = showtimeStart;
-    }
-
-    public LocalDateTime getBookingDate() {
-        return bookingDate;
-    }
-
-    public void setBookingDate(LocalDateTime bookingDate) {
-        this.bookingDate = bookingDate;
-    }
-
-    public BookingStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(BookingStatus status) {
-        this.status = status;
-    }
-
-    public Double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(Double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public List<SeatDTO> getSeats() {
-        return seats;
-    }
-
-    public void setSeats(List<SeatDTO> seats) {
         this.seats = seats;
     }
 

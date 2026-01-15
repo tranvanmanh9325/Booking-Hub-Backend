@@ -1,10 +1,14 @@
 package com.example.booking.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "rooms")
 public class Room {
@@ -71,94 +75,6 @@ public class Room {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.images = images;
-        this.bookings = bookings;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Hotel getHotel() {
-        return hotel;
-    }
-
-    public void setHotel(Hotel hotel) {
-        this.hotel = hotel;
-    }
-
-    public String getRoomType() {
-        return roomType;
-    }
-
-    public void setRoomType(String roomType) {
-        this.roomType = roomType;
-    }
-
-    public Integer getMaxGuests() {
-        return maxGuests;
-    }
-
-    public void setMaxGuests(Integer maxGuests) {
-        this.maxGuests = maxGuests;
-    }
-
-    public Double getPricePerNight() {
-        return pricePerNight;
-    }
-
-    public void setPricePerNight(Double pricePerNight) {
-        this.pricePerNight = pricePerNight;
-    }
-
-    public String getAmenities() {
-        return amenities;
-    }
-
-    public void setAmenities(String amenities) {
-        this.amenities = amenities;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<RoomImage> getImages() {
-        return images;
-    }
-
-    public void setImages(List<RoomImage> images) {
-        this.images = images;
-    }
-
-    public List<HotelBooking> getBookings() {
-        return bookings;
-    }
-
-    public void setBookings(List<HotelBooking> bookings) {
         this.bookings = bookings;
     }
 

@@ -2,10 +2,14 @@ package com.example.booking.model;
 
 import jakarta.persistence.*;
 import com.example.booking.enums.BookingStatus;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "movie_bookings")
 public class MovieBooking {
@@ -68,78 +72,6 @@ public class MovieBooking {
         this.totalPrice = totalPrice;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.bookingSeats = bookingSeats;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Showtime getShowtime() {
-        return showtime;
-    }
-
-    public void setShowtime(Showtime showtime) {
-        this.showtime = showtime;
-    }
-
-    public LocalDateTime getBookingDate() {
-        return bookingDate;
-    }
-
-    public void setBookingDate(LocalDateTime bookingDate) {
-        this.bookingDate = bookingDate;
-    }
-
-    public BookingStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(BookingStatus status) {
-        this.status = status;
-    }
-
-    public Double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(Double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<BookingSeat> getBookingSeats() {
-        return bookingSeats;
-    }
-
-    public void setBookingSeats(List<BookingSeat> bookingSeats) {
         this.bookingSeats = bookingSeats;
     }
 

@@ -4,7 +4,11 @@ import java.time.LocalDateTime;
 import com.example.booking.enums.BookingType;
 import com.example.booking.enums.PaymentMethod;
 import com.example.booking.enums.PaymentStatus;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class PaymentDTO {
     private Long id;
     private Long bookingId;
@@ -29,78 +33,6 @@ public class PaymentDTO {
         this.transactionId = transactionId;
         this.status = status;
         this.paidAt = paidAt;
-        this.createdAt = createdAt;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getBookingId() {
-        return bookingId;
-    }
-
-    public void setBookingId(Long bookingId) {
-        this.bookingId = bookingId;
-    }
-
-    public BookingType getBookingType() {
-        return bookingType;
-    }
-
-    public void setBookingType(BookingType bookingType) {
-        this.bookingType = bookingType;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getPaidAt() {
-        return paidAt;
-    }
-
-    public void setPaidAt(LocalDateTime paidAt) {
-        this.paidAt = paidAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

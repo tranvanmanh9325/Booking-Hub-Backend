@@ -38,4 +38,8 @@ public class Content {
 
     @Column(name = "images", columnDefinition = "TEXT")
     private String images; // JSON array of image URLs
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
 }

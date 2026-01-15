@@ -1,5 +1,10 @@
 package com.example.booking.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class SeatDTO {
     private Long id;
     private Long screenId;
@@ -17,54 +22,6 @@ public class SeatDTO {
         this.row = row;
         this.number = number;
         this.seatType = seatType;
-        this.isBooked = isBooked;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getScreenId() {
-        return screenId;
-    }
-
-    public void setScreenId(Long screenId) {
-        this.screenId = screenId;
-    }
-
-    public String getRow() {
-        return row;
-    }
-
-    public void setRow(String row) {
-        this.row = row;
-    }
-
-    public Integer getNumber() {
-        return number;
-    }
-
-    public void setNumber(Integer number) {
-        this.number = number;
-    }
-
-    public String getSeatType() {
-        return seatType;
-    }
-
-    public void setSeatType(String seatType) {
-        this.seatType = seatType;
-    }
-
-    public Boolean getIsBooked() {
-        return isBooked;
-    }
-
-    public void setIsBooked(Boolean isBooked) {
         this.isBooked = isBooked;
     }
 

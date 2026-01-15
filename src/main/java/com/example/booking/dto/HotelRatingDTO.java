@@ -1,5 +1,10 @@
 package com.example.booking.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class HotelRatingDTO {
     private Long hotelId;
     private Double averageRating;
@@ -9,19 +14,4 @@ public class HotelRatingDTO {
         this.averageRating = averageRating;
     }
 
-    public Long getHotelId() {
-        return hotelId;
-    }
-
-    public void setHotelId(Long hotelId) {
-        this.hotelId = hotelId;
-    }
-
-    public Double getAverageRating() {
-        return averageRating;
-    }
-
-    public void setAverageRating(Double averageRating) {
-        this.averageRating = averageRating;
-    }
 }

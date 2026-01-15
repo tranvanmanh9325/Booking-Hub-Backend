@@ -39,11 +39,15 @@ public class BookingService {
     private final SeatRepository seatRepository;
     private final EmailService emailService;
     private final BookingMapper bookingMapper;
+    // Added for Content Booking
+    private final ContentBookingRepository contentBookingRepository;
+    private final ContentRepository contentRepository;
 
     public BookingService(HotelBookingRepository hotelBookingRepository, MovieBookingRepository movieBookingRepository,
             UserRepository userRepository, HotelRepository hotelRepository, RoomRepository roomRepository,
             ShowtimeRepository showtimeRepository, BookingSeatRepository bookingSeatRepository,
-            SeatRepository seatRepository, EmailService emailService, BookingMapper bookingMapper) {
+            SeatRepository seatRepository, EmailService emailService, BookingMapper bookingMapper,
+            ContentBookingRepository contentBookingRepository, ContentRepository contentRepository) {
         this.hotelBookingRepository = hotelBookingRepository;
         this.movieBookingRepository = movieBookingRepository;
         this.userRepository = userRepository;
@@ -54,6 +58,8 @@ public class BookingService {
         this.seatRepository = seatRepository;
         this.emailService = emailService;
         this.bookingMapper = bookingMapper;
+        this.contentBookingRepository = contentBookingRepository;
+        this.contentRepository = contentRepository;
     }
 
     // Hotel Booking Methods
@@ -272,5 +278,16 @@ public class BookingService {
         }
 
         return bookingMapper.toMovieBookingDTO(booking);
+    }
+
+    // Content Booking Methods (Entertainment)
+
+    @Transactional(readOnly = true)
+    public List<ContentBooking> getContentBookingsForPartner(String partnerEmail) {
+        List<Content> contents = contentRepository.findByOwnerEmail(partnerEmail);
+        if (contents.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        return contentBookingRepository.findByContentInOrderByBookingDateDesc(contents);
     }
 }

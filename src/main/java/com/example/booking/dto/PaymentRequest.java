@@ -4,7 +4,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import com.example.booking.enums.BookingType;
 import com.example.booking.enums.PaymentMethod;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class PaymentRequest {
 
     @NotNull(message = "Booking ID is required")
@@ -27,38 +31,6 @@ public class PaymentRequest {
         this.bookingId = bookingId;
         this.bookingType = bookingType;
         this.amount = amount;
-        this.paymentMethod = paymentMethod;
-    }
-
-    public Long getBookingId() {
-        return bookingId;
-    }
-
-    public void setBookingId(Long bookingId) {
-        this.bookingId = bookingId;
-    }
-
-    public BookingType getBookingType() {
-        return bookingType;
-    }
-
-    public void setBookingType(BookingType bookingType) {
-        this.bookingType = bookingType;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 

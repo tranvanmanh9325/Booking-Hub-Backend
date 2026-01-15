@@ -14,11 +14,22 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
 
+    private final com.example.booking.repository.UserRepository userRepository;
+
     public List<Content> getAllContent() {
         return contentRepository.findAll();
     }
 
-    public Content addContent(@NonNull Content content) {
+    public List<Content> getContentByPartner(String email) {
+        return contentRepository.findByOwnerEmail(email);
+    }
+
+    public Content addContent(@NonNull Content content, String ownerEmail) {
+        if (ownerEmail != null) {
+            com.example.booking.model.User owner = userRepository.findByEmail(ownerEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found with email: " + ownerEmail));
+            content.setOwner(owner);
+        }
         return contentRepository.save(content);
     }
 

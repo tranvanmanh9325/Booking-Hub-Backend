@@ -1,7 +1,12 @@
 package com.example.booking.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@Setter
+@Getter
 public class RoomDTO {
     private Long id;
     private Long hotelId;
@@ -26,78 +31,6 @@ public class RoomDTO {
         this.amenities = amenities;
         this.roomNumber = roomNumber;
         this.imageUrls = imageUrls;
-        this.isAvailable = isAvailable;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getHotelId() {
-        return hotelId;
-    }
-
-    public void setHotelId(Long hotelId) {
-        this.hotelId = hotelId;
-    }
-
-    public String getRoomType() {
-        return roomType;
-    }
-
-    public void setRoomType(String roomType) {
-        this.roomType = roomType;
-    }
-
-    public Integer getMaxGuests() {
-        return maxGuests;
-    }
-
-    public void setMaxGuests(Integer maxGuests) {
-        this.maxGuests = maxGuests;
-    }
-
-    public Double getPricePerNight() {
-        return pricePerNight;
-    }
-
-    public void setPricePerNight(Double pricePerNight) {
-        this.pricePerNight = pricePerNight;
-    }
-
-    public String getAmenities() {
-        return amenities;
-    }
-
-    public void setAmenities(String amenities) {
-        this.amenities = amenities;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    public List<String> getImageUrls() {
-        return imageUrls;
-    }
-
-    public void setImageUrls(List<String> imageUrls) {
-        this.imageUrls = imageUrls;
-    }
-
-    public Boolean getIsAvailable() {
-        return isAvailable;
-    }
-
-    public void setIsAvailable(Boolean isAvailable) {
         this.isAvailable = isAvailable;
     }
 
