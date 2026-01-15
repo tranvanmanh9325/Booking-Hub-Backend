@@ -168,6 +168,24 @@ public class HotelController {
     }
 
     /**
+     * Lấy danh sách đặt phòng của các khách sạn thuộc đối tác.
+     *
+     * @param authentication Thông tin xác thực người dùng (Partner)
+     * @return ResponseEntity chứa List<HotelBookingDTO>
+     */
+    @Operation(summary = "Get partner bookings", description = "Retrieves bookings for hotels owned by the authenticated partner (matched by email).")
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/partner/bookings")
+    public ResponseEntity<List<HotelBookingDTO>> getPartnerBookings(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
+        // Use user's email to find owned hotels
+        return ResponseEntity.ok(bookingService.getPartnerBookings(user.getEmail()));
+    }
+
+    /**
      * Lấy chi tiết một đơn đặt phòng.
      * 
      * @param bookingId      ID đơn đặt phòng

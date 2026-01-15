@@ -156,6 +156,17 @@ public class User {
         this.role = role;
     }
 
+    @Column(name = "partner_type")
+    private String partnerType;
+
+    public String getPartnerType() {
+        return partnerType;
+    }
+
+    public void setPartnerType(String partnerType) {
+        this.partnerType = partnerType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)

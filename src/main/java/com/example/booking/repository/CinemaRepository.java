@@ -8,8 +8,8 @@ import java.util.List;
 
 @Repository
 public interface CinemaRepository extends JpaRepository<Cinema, Long> {
-    
+
     List<Cinema> findByCity(String city);
-    
+
     List<Cinema> findByNameContainingIgnoreCase(String name);
 }

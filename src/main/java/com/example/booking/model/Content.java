@@ -27,6 +27,15 @@ public class Content {
     @Column(nullable = true)
     private String price; // Keeping as String for flexibility based on frontend, or could be BigDecimal
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Column(nullable = false)
     private String status; // active, inactive
+
+    @Column(name = "thumbnail")
+    private String thumbnail;
+
+    @Column(name = "images", columnDefinition = "TEXT")
+    private String images; // JSON array of image URLs
 }

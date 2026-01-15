@@ -160,6 +160,17 @@ public class BookingService {
         return bookingMapper.toHotelBookingDTO(booking);
     }
 
+    @Transactional(readOnly = true)
+    public List<HotelBookingDTO> getPartnerBookings(String partnerEmail) {
+        List<Hotel> hotels = hotelRepository.findByEmail(partnerEmail);
+        if (hotels.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        return hotelBookingRepository.findByHotelInOrderByCreatedAtDesc(hotels).stream()
+                .map(bookingMapper::toHotelBookingDTO)
+                .collect(Collectors.toList());
+    }
+
     // Movie Booking Methods
 
     /**

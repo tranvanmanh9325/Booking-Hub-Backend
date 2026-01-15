@@ -13,4 +13,5 @@ public class UserUpdateDTO {
     private String fullName;
     private String phone;
     private String role;
+    private String partnerType;
 }

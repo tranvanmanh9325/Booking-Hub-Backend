@@ -42,4 +42,6 @@ public interface HotelBookingRepository extends JpaRepository<HotelBooking, Long
        @Query("SELECT hb FROM HotelBooking hb WHERE hb.checkIn = :checkIn AND hb.status = :status")
        List<HotelBooking> findByCheckInAndStatus(@Param("checkIn") LocalDate checkIn,
                      @Param("status") BookingStatus status);
+
+       List<HotelBooking> findByHotelInOrderByCreatedAtDesc(List<com.example.booking.model.Hotel> hotels);
 }

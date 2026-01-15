@@ -17,6 +17,7 @@ public interface UserMapper {
     @Mapping(target = "resetPasswordToken", ignore = true)
     @Mapping(target = "resetPasswordTokenExpiry", ignore = true)
     @Mapping(target = "role", ignore = true)
+    @Mapping(target = "partnerType", ignore = true)
     User toUser(RegisterRequest request);
 
     @Mapping(target = "userId", source = "user.id")
@@ -28,5 +29,6 @@ public interface UserMapper {
     @Mapping(target = "type", source = "type")
     @Mapping(target = "role", source = "user.role")
     @Mapping(target = "avatarUrl", source = "user.avatarUrl")
+    @Mapping(target = "partnerType", source = "user.partnerType")
     AuthResponse toAuthResponse(User user, String token, String refreshToken, String type);
 }

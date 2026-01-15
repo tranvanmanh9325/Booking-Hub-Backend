@@ -14,4 +14,6 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
     List<Hotel> findByNameContainingIgnoreCase(String name);
 
     List<Hotel> findByStarRating(Integer starRating);
+
+    List<Hotel> findByEmail(String email);
 }

@@ -1,0 +1,2 @@
+ALTER TABLE users
+ADD COLUMN partner_type VARCHAR(50);

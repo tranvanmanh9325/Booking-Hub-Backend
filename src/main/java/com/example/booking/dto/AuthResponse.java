@@ -10,6 +10,7 @@ public class AuthResponse {
     private String phone;
     private String role;
     private String avatarUrl;
+    private String partnerType;
 
     public AuthResponse() {
     }
@@ -99,6 +100,14 @@ public class AuthResponse {
         this.avatarUrl = avatarUrl;
     }
 
+    public String getPartnerType() {
+        return partnerType;
+    }
+
+    public void setPartnerType(String partnerType) {
+        this.partnerType = partnerType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -130,6 +139,7 @@ public class AuthResponse {
                 ", phone='" + phone + '\'' +
                 ", role='" + role + '\'' +
                 ", avatarUrl='" + avatarUrl + '\'' +
+                ", partnerType='" + partnerType + '\'' +
                 '}';
     }
 }

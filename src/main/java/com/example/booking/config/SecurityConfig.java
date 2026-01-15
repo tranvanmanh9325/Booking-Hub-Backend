@@ -90,6 +90,7 @@ public class SecurityConfig {
                                                 .authenticated()
                                                 .requestMatchers("/api/v1/payments/**").authenticated()
                                                 .requestMatchers("/api/v1/content/**").permitAll()
+                                                .requestMatchers("/api/v1/files/**").permitAll()
                                                 .anyRequest().authenticated());
                 return http.build();
         }

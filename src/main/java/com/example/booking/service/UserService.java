@@ -86,6 +86,9 @@ public class UserService {
         if (request.getRole() != null) {
             user.setRole(request.getRole());
         }
+        if (request.getPartnerType() != null) {
+            user.setPartnerType(request.getPartnerType());
+        }
 
         return userRepository.save(user);
     }

@@ -64,13 +64,43 @@ public class CloudinaryService {
         }
     }
 
+    public String uploadFile(MultipartFile file, String folder) throws IOException {
+        // 1. Validate file (size, type) - can be done here or in controller
+
+        // 2. Compress image using Thumbnailator (assuming it's an image for now)
+        File compressedFile = compressImage(file);
+
+        try {
+            // 3. Upload to Cloudinary
+            Map<?, ?> uploadResult = getCloudinary().uploader().upload(compressedFile, ObjectUtils.asMap(
+                    "folder", folder,
+                    "public_id", UUID.randomUUID().toString(),
+                    "resource_type", "auto"));
+
+            return (String) uploadResult.get("secure_url");
+        } finally {
+            // 4. Clean up temporary file
+            if (compressedFile.exists()) {
+                compressedFile.delete();
+            }
+        }
+    }
+
     private File compressImage(MultipartFile file) throws IOException {
-        Path tempPath = Files.createTempFile("avatar_", ".jpg");
+        String originalFilename = file.getOriginalFilename();
+        String extension = ".jpg";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        Path tempPath = Files.createTempFile("upload_", extension);
         File tempFile = tempPath.toFile();
 
-        // Compress logic: Resize to max 800px width, quality 0.8
+        // Compress logic: Resize to max 1200px (larger for content), quality 0.8
+        // Thumbnailator automatically handles the output format based on the file
+        // extension
         Thumbnails.of(file.getInputStream())
-                .size(800, 800) // Max width/height
+                .size(1200, 1200) // Max width/height for content
                 .outputQuality(0.8)
                 .toFile(tempFile);
 

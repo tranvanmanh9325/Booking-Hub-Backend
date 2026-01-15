@@ -29,6 +29,9 @@ public class ContentService {
         content.setName(contentDetails.getName());
         content.setType(contentDetails.getType());
         content.setPrice(contentDetails.getPrice());
+        content.setDescription(contentDetails.getDescription());
+        content.setThumbnail(contentDetails.getThumbnail());
+        content.setImages(contentDetails.getImages());
         content.setStatus(contentDetails.getStatus());
 
         return contentRepository.save(content);
