@@ -74,7 +74,7 @@ public class MovieController {
     @ApiResponse(responseCode = "404", description = "Movie not found")
     @GetMapping("/{id}")
     public ResponseEntity<MovieDTO> getMovieById(
-            @Parameter(description = "ID of the movie") @PathVariable @Min(1) Long id) {
+            @Parameter(description = "ID of the movie") @PathVariable Long id) {
         return ResponseEntity.ok(searchService.getMovieById(id));
     }
 
@@ -124,7 +124,7 @@ public class MovieController {
     @Operation(summary = "Get showtimes by movie", description = "Retrieves scheduled showtimes for a specific movie.")
     @GetMapping("/{movieId}/showtimes")
     public ResponseEntity<List<ShowtimeDTO>> getShowtimesByMovie(
-            @Parameter(description = "ID of the movie") @PathVariable @Min(1) Long movieId) {
+            @Parameter(description = "ID of the movie") @PathVariable Long movieId) {
         return ResponseEntity.ok(searchService.getShowtimesByMovie(movieId));
     }
 

@@ -39,6 +39,15 @@ public class Content {
     @Column(name = "images", columnDefinition = "TEXT")
     private String images; // JSON array of image URLs
 
+    @Column(name = "duration")
+    private Integer duration;
+
+    @Column(name = "release_date")
+    private String releaseDate;
+
+    @Column(name = "location")
+    private String location;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;

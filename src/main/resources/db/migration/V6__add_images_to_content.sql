@@ -1,4 +1,0 @@
-ALTER TABLE content
-ADD COLUMN thumbnail VARCHAR(255);
-ALTER TABLE content
-ADD COLUMN images TEXT;

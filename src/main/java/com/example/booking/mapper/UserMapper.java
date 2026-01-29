@@ -6,7 +6,7 @@ import com.example.booking.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface UserMapper {
 
     @Mapping(target = "password", ignore = true) // Handled by PasswordEncoder in service
@@ -24,11 +24,11 @@ public interface UserMapper {
     @Mapping(target = "email", source = "user.email")
     @Mapping(target = "fullName", source = "user.fullName")
     @Mapping(target = "phone", source = "user.phone")
-    @Mapping(target = "token", source = "token")
+    @Mapping(target = "token", source = "accessToken")
     @Mapping(target = "refreshToken", source = "refreshToken")
-    @Mapping(target = "type", source = "type")
+    @Mapping(target = "type", source = "tokenType")
     @Mapping(target = "role", source = "user.role")
     @Mapping(target = "avatarUrl", source = "user.avatarUrl")
     @Mapping(target = "partnerType", source = "user.partnerType")
-    AuthResponse toAuthResponse(User user, String token, String refreshToken, String type);
+    AuthResponse toAuthResponse(User user, String accessToken, String refreshToken, String tokenType);
 }

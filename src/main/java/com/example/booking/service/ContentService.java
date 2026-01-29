@@ -7,19 +7,23 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ContentService {
 
     private final ContentRepository contentRepository;
 
     private final com.example.booking.repository.UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<Content> getAllContent() {
         return contentRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<Content> getContentByPartner(String email) {
         return contentRepository.findByOwnerEmail(email);
     }

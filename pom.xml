@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.9</version>
+		<version>3.5.10</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
@@ -33,12 +33,12 @@
 		<maven.compiler.target>21</maven.compiler.target>
 		<logback.version>1.5.24</logback.version>
 		<lombok.version>1.18.36</lombok.version>
+		<mapstruct.version>1.6.3</mapstruct.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -145,7 +145,7 @@
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
-			<version>1.6.3</version>
+			<version>${mapstruct.version}</version>
 		</dependency>
 		<!-- Monitoring & Logging -->
 		<dependency>
@@ -187,6 +187,8 @@
 			<artifactId>thumbnailator</artifactId>
 			<version>0.4.20</version>
 		</dependency>
+
+
 	</dependencies>
 
 	<build>
@@ -195,14 +197,20 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.13.0</version>
-
 				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
@@ -217,20 +225,11 @@
 						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
-							<version>1.6.3</version>
+							<version>${mapstruct.version}</version>
 						</path>
 					</annotationProcessorPaths>
-					<fork>true</fork>
 					<compilerArgs>
-						<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
-						<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
-						<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
-						<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-						<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
-						<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
-						<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
-						<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
-						<arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+						<arg>-parameters</arg>
 					</compilerArgs>
 				</configuration>
 			</plugin>

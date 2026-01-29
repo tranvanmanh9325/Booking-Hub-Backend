@@ -37,12 +37,14 @@ public class SearchService {
     private final ReviewService reviewService;
     private final HotelMapper hotelMapper;
     private final MovieMapper movieMapper;
+    private final ContentRepository contentRepository;
 
     public SearchService(HotelRepository hotelRepository, MovieRepository movieRepository,
             RoomRepository roomRepository, CinemaRepository cinemaRepository,
             ShowtimeRepository showtimeRepository, SeatRepository seatRepository,
             HotelBookingRepository hotelBookingRepository, BookingSeatRepository bookingSeatRepository,
-            ReviewService reviewService, HotelMapper hotelMapper, MovieMapper movieMapper) {
+            ReviewService reviewService, HotelMapper hotelMapper, MovieMapper movieMapper,
+            ContentRepository contentRepository) {
         this.hotelRepository = hotelRepository;
         this.movieRepository = movieRepository;
         this.roomRepository = roomRepository;
@@ -54,6 +56,7 @@ public class SearchService {
         this.reviewService = reviewService;
         this.hotelMapper = hotelMapper;
         this.movieMapper = movieMapper;
+        this.contentRepository = contentRepository;
     }
 
     // Hotel Search Methods
@@ -142,6 +145,14 @@ public class SearchService {
     @org.springframework.cache.annotation.Cacheable(value = "movies", key = "#id")
     public MovieDTO getMovieById(Long id) {
         logger.debug("Fetching movie with id: {}", id);
+
+        if (id < 0) {
+            Long contentId = -id;
+            Content content = contentRepository.findById(contentId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Movie/Content not found"));
+            return mapContentToMovieDTO(content);
+        }
+
         Movie movie = movieRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> {
                     logger.error("Movie not found with id: {}", id);
@@ -163,9 +174,50 @@ public class SearchService {
     }
 
     public List<MovieDTO> getNowShowing() {
-        return movieRepository.findNowShowing().stream()
+        List<MovieDTO> movies = movieRepository.findNowShowing().stream()
                 .map(movieMapper::toMovieDTO)
                 .collect(Collectors.toList());
+
+        // Also fetch from Content repository (Movies/Products added via generic CMS)
+        List<String> types = java.util.Arrays.asList("Movie", "Sản phẩm", "Phim", "Product");
+        List<Content> contents = contentRepository.findByTypeInAndStatus(types, "active");
+
+        List<MovieDTO> contentMovies = contents.stream()
+                .map(this::mapContentToMovieDTO)
+                .collect(Collectors.toList());
+
+        movies.addAll(contentMovies);
+        return movies;
+    }
+
+    private MovieDTO mapContentToMovieDTO(Content content) {
+        MovieDTO dto = new MovieDTO();
+        // Use negative ID to avoid collision with real Movie IDs
+        dto.setId(-content.getId());
+        dto.setTitle(content.getName());
+        dto.setDescription(content.getDescription());
+        dto.setGenre(content.getType());
+        dto.setDuration(content.getDuration() != null ? content.getDuration() : 120);
+        dto.setRating(5.0);
+        dto.setPosterUrl(content.getThumbnail());
+        dto.setTrailerUrl(null);
+
+        // Parse release date if possible, otherwise use Now
+        if (content.getReleaseDate() != null) {
+            try {
+                // Assuming format yyyy-MM-dd
+                String dateStr = content.getReleaseDate();
+                if (dateStr.length() > 10)
+                    dateStr = dateStr.substring(0, 10);
+                dto.setReleaseDate(LocalDate.parse(dateStr).atStartOfDay());
+            } catch (Exception e) {
+                dto.setReleaseDate(java.time.LocalDateTime.now());
+            }
+        } else {
+            dto.setReleaseDate(java.time.LocalDateTime.now());
+        }
+
+        return dto;
     }
 
     public List<CinemaDTO> getAllCinemas() {
@@ -181,6 +233,47 @@ public class SearchService {
     }
 
     public List<ShowtimeDTO> getShowtimesByMovie(Long movieId) {
+        if (movieId < 0) {
+            // Generate mock showtimes for Content Movies
+            List<ShowtimeDTO> showtimes = new java.util.ArrayList<>();
+            LocalDate today = LocalDate.now();
+
+            // Generate showtimes for next 7 days
+            for (int i = 0; i < 7; i++) {
+                LocalDate date = today.plusDays(i);
+
+                // Show 1: 19:30
+                ShowtimeDTO s1 = new ShowtimeDTO();
+                s1.setId((long) -(i * 100 + 1)); // Mock ID: -1, -101, etc.
+                s1.setMovieId(movieId);
+                // We'd need to fetch title ideally, but for now leave blank or fetch
+                // lightweight
+                // But frontend usually has movie details already.
+                s1.setScreenId(1L);
+                s1.setScreenName("Rạp 3");
+                s1.setCinemaId(1L);
+                s1.setCinemaName("Booking Hub Center");
+                s1.setStartTime(date.atTime(19, 30));
+                s1.setEndTime(date.atTime(21, 30));
+                s1.setPrice(85000.0);
+                showtimes.add(s1);
+
+                // Show 2: 22:00
+                ShowtimeDTO s2 = new ShowtimeDTO();
+                s2.setId((long) -(i * 100 + 2));
+                s2.setMovieId(movieId);
+                s2.setScreenId(1L);
+                s2.setScreenName("Rạp 3");
+                s2.setCinemaId(1L);
+                s2.setCinemaName("Booking Hub Center");
+                s2.setStartTime(date.atTime(22, 0));
+                s2.setEndTime(date.atTime(0, 0));
+                s2.setPrice(95000.0);
+                showtimes.add(s2);
+            }
+            return showtimes;
+        }
+
         return showtimeRepository.findByMovieId(movieId).stream()
                 .map(movieMapper::toShowtimeDTO)
                 .collect(Collectors.toList());

@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
-public class ShowtimeDTO {
+public class ShowtimeDTO implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
     private Long id;
     private Long movieId;
     private String movieTitle;

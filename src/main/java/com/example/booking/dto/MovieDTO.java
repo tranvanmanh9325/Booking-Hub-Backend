@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
-public class MovieDTO {
+public class MovieDTO implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
     private Long id;
     private String title;
     private String description;
