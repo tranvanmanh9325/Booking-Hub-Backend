@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface ScreenRepository extends JpaRepository<Screen, Long> {
-    
+
     List<Screen> findByCinemaId(Long cinemaId);
+
+    java.util.Optional<Screen> findByNameAndCinemaId(String name, Long cinemaId);
 }

@@ -12,13 +12,15 @@ import java.util.List;
 @Repository
 public interface ShowtimeRepository extends JpaRepository<Showtime, Long> {
 
-    @Query("SELECT s FROM Showtime s JOIN FETCH s.screen sc JOIN FETCH sc.cinema JOIN FETCH s.movie WHERE s.movie.id = :movieId")
-    List<Showtime> findByMovieId(@Param("movieId") Long movieId);
+        // Existing method - might need to check usage
+        List<Showtime> findByMovieId(Long movieId);
 
-    List<Showtime> findByScreenId(Long screenId);
+        // New method for Content
+        List<Showtime> findByContentId(Long contentId);
 
-    @Query("SELECT s FROM Showtime s WHERE s.movie.id = :movieId AND s.startTime >= :startDate AND s.startTime < :endDate ORDER BY s.startTime ASC")
-    List<Showtime> findByMovieIdAndDateRange(@Param("movieId") Long movieId,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        @Query("SELECT s FROM Showtime s WHERE s.screen.id = :screenId AND " +
+                        "((s.startTime <= :endTime AND s.endTime >= :startTime))")
+        List<Showtime> findConflictingShowtimes(@Param("screenId") Long screenId,
+                        @Param("startTime") LocalDateTime startTime,
+                        @Param("endTime") LocalDateTime endTime);
 }

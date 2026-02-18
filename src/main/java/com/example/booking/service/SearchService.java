@@ -31,6 +31,7 @@ public class SearchService {
     private final RoomRepository roomRepository;
     private final CinemaRepository cinemaRepository;
     private final ShowtimeRepository showtimeRepository;
+    private final ScreenRepository screenRepository;
     private final SeatRepository seatRepository;
     private final HotelBookingRepository hotelBookingRepository;
     private final BookingSeatRepository bookingSeatRepository;
@@ -44,7 +45,7 @@ public class SearchService {
             ShowtimeRepository showtimeRepository, SeatRepository seatRepository,
             HotelBookingRepository hotelBookingRepository, BookingSeatRepository bookingSeatRepository,
             ReviewService reviewService, HotelMapper hotelMapper, MovieMapper movieMapper,
-            ContentRepository contentRepository) {
+            ContentRepository contentRepository, ScreenRepository screenRepository) {
         this.hotelRepository = hotelRepository;
         this.movieRepository = movieRepository;
         this.roomRepository = roomRepository;
@@ -57,6 +58,7 @@ public class SearchService {
         this.hotelMapper = hotelMapper;
         this.movieMapper = movieMapper;
         this.contentRepository = contentRepository;
+        this.screenRepository = screenRepository;
     }
 
     // Hotel Search Methods
@@ -234,44 +236,9 @@ public class SearchService {
 
     public List<ShowtimeDTO> getShowtimesByMovie(Long movieId) {
         if (movieId < 0) {
-            // Generate mock showtimes for Content Movies
-            List<ShowtimeDTO> showtimes = new java.util.ArrayList<>();
-            LocalDate today = LocalDate.now();
-
-            // Generate showtimes for next 7 days
-            for (int i = 0; i < 7; i++) {
-                LocalDate date = today.plusDays(i);
-
-                // Show 1: 19:30
-                ShowtimeDTO s1 = new ShowtimeDTO();
-                s1.setId((long) -(i * 100 + 1)); // Mock ID: -1, -101, etc.
-                s1.setMovieId(movieId);
-                // We'd need to fetch title ideally, but for now leave blank or fetch
-                // lightweight
-                // But frontend usually has movie details already.
-                s1.setScreenId(1L);
-                s1.setScreenName("Rạp 3");
-                s1.setCinemaId(1L);
-                s1.setCinemaName("Booking Hub Center");
-                s1.setStartTime(date.atTime(19, 30));
-                s1.setEndTime(date.atTime(21, 30));
-                s1.setPrice(85000.0);
-                showtimes.add(s1);
-
-                // Show 2: 22:00
-                ShowtimeDTO s2 = new ShowtimeDTO();
-                s2.setId((long) -(i * 100 + 2));
-                s2.setMovieId(movieId);
-                s2.setScreenId(1L);
-                s2.setScreenName("Rạp 3");
-                s2.setCinemaId(1L);
-                s2.setCinemaName("Booking Hub Center");
-                s2.setStartTime(date.atTime(22, 0));
-                s2.setEndTime(date.atTime(0, 0));
-                s2.setPrice(95000.0);
-                showtimes.add(s2);
-            }
-            return showtimes;
+            return showtimeRepository.findByContentId(-movieId).stream()
+                    .map(movieMapper::toShowtimeDTO)
+                    .collect(Collectors.toList());
         }
 
         return showtimeRepository.findByMovieId(movieId).stream()
@@ -285,6 +252,12 @@ public class SearchService {
 
         return seats.stream()
                 .map(seat -> movieMapper.toSeatDTO(seat, bookedSeatIds.contains(seat.getId())))
+                .collect(Collectors.toList());
+    }
+
+    public List<com.example.booking.dto.ScreenDTO> getScreensByCinema(Long cinemaId) {
+        return screenRepository.findByCinemaId(cinemaId).stream()
+                .map(movieMapper::toScreenDTO)
                 .collect(Collectors.toList());
     }
 }

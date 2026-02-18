@@ -18,7 +18,11 @@ public class Showtime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_id", nullable = false)
+    @JoinColumn(name = "content_id", nullable = true)
+    private Content content;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movie_id", nullable = true)
     private Movie movie;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -57,9 +61,11 @@ public class Showtime {
     public Showtime() {
     }
 
-    public Showtime(Long id, Movie movie, Screen screen, LocalDateTime startTime, LocalDateTime endTime, Double price,
+    public Showtime(Long id, Content content, Movie movie, Screen screen, LocalDateTime startTime,
+            LocalDateTime endTime, Double price,
             LocalDateTime createdAt, LocalDateTime updatedAt, List<MovieBooking> bookings) {
         this.id = id;
+        this.content = content;
         this.movie = movie;
         this.screen = screen;
         this.startTime = startTime;
@@ -78,6 +84,7 @@ public class Showtime {
             return false;
         Showtime showtime = (Showtime) o;
         return java.util.Objects.equals(id, showtime.id) &&
+                java.util.Objects.equals(content, showtime.content) &&
                 java.util.Objects.equals(movie, showtime.movie) &&
                 java.util.Objects.equals(screen, showtime.screen) &&
                 java.util.Objects.equals(startTime, showtime.startTime) &&
@@ -89,13 +96,14 @@ public class Showtime {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, movie, screen, startTime, endTime, price, createdAt, updatedAt);
+        return java.util.Objects.hash(id, content, movie, screen, startTime, endTime, price, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
         return "Showtime{" +
                 "id=" + id +
+                ", content=" + content +
                 ", movie=" + movie +
                 ", screen=" + screen +
                 ", startTime=" + startTime +

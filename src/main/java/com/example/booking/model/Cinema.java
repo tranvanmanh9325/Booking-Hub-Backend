@@ -102,7 +102,6 @@ public class Cinema {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
-                ", screens=" + screens +
                 '}';
     }
 }

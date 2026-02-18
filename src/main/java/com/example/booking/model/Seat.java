@@ -85,7 +85,7 @@ public class Seat {
     public String toString() {
         return "Seat{" +
                 "id=" + id +
-                ", screen=" + screen +
+                ", screenId=" + (screen != null ? screen.getId() : null) +
                 ", row='" + row + '\'' +
                 ", number=" + number +
                 ", seatType='" + seatType + '\'' +

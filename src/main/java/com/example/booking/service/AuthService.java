@@ -153,9 +153,9 @@ public class AuthService {
             if (request.getPicture() != null && !request.getPicture().isEmpty()) {
                 user.setAvatarUrl(request.getPicture());
             }
-            // Update name if provided and different
+            // Update name only if current name is null or empty
             if (request.getName() != null && !request.getName().isEmpty()
-                    && !request.getName().equals(user.getFullName())) {
+                    && (user.getFullName() == null || user.getFullName().isEmpty())) {
                 user.setFullName(request.getName());
             }
             user = userRepository.save(user);

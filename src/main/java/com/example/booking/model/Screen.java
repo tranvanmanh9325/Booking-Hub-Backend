@@ -94,7 +94,7 @@ public class Screen {
     public String toString() {
         return "Screen{" +
                 "id=" + id +
-                ", cinema=" + cinema +
+                ", cinemaId=" + (cinema != null ? cinema.getId() : null) +
                 ", name='" + name + '\'' +
                 ", capacity=" + capacity +
                 ", screenType='" + screenType + '\'' +

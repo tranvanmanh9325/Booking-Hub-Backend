@@ -48,6 +48,9 @@ public class ContentService {
         content.setThumbnail(contentDetails.getThumbnail());
         content.setImages(contentDetails.getImages());
         content.setStatus(contentDetails.getStatus());
+        content.setDuration(contentDetails.getDuration());
+        content.setReleaseDate(contentDetails.getReleaseDate());
+        content.setLocation(contentDetails.getLocation());
 
         return contentRepository.save(content);
     }
